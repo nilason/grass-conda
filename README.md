@@ -20,3 +20,10 @@ local disk. Edit the `configure-build.sh` file. Start compiling with
 
 You can also do `./build-grass.sh --help` for info on possible configurations,
 that overrides the configure-build.sh.
+
+If GRASS GIS source directory is a git repository, the patches can be reset with:
+```
+cd grass-source-dir
+git reset --hard
+git clean -f -d
+```
