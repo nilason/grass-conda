@@ -13,8 +13,10 @@ conda create -n anaconda_p37 python==3.7.8 anaconda
 
 ## Instructions
 
-Fork or download this grass-conda repository to local disk.
-In terminal `cd` to the grass-conda directory.
-Make sure you have the GRASS GIS source directory on local disk.
-Edit the `configure-build.sh` file.
-Start compiling with `./build-grass.sh`.
+Fork or download this grass-conda repository to local disk. In terminal `cd` to
+the grass-conda directory. Make sure you have the GRASS GIS source directory on 
+local disk. Edit the `configure-build.sh` file. Start compiling with
+`./build-grass.sh`.
+
+You can also do `./build-grass.sh --help` for info on possible configurations,
+that overrides the configure-build.sh.
