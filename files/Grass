@@ -1,0 +1,29 @@
+#!/bin/sh
+# Script: nw2
+# Opens a new Terminal window
+
+script_dir=$(dirname "$(dirname "$0")")
+
+language=$(defaults read -g AppleLanguages | \
+    awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/').UTF-8
+
+shell=$(which bash)
+
+# Check language code against 'locale' which is available since 10.14,
+# alternatively with regex pattern check. Failed check will fallback
+# using English (US) as default.
+LOCALE=`which locale`
+if test "$LOCALE" = ""; then
+    [[ $language =~ ^[a-z]{2}\_[A-Z]{2}\.UTF-8$ ]] || language="en_US.UTF-8"
+else
+    if [ $($LOCALE -a | grep -c $language) -eq 0 ]; then
+        language="en_US.UTF-8"
+    fi
+fi
+
+osascript  <<EOF
+tell app "Terminal"
+  do script "/usr/bin/env -i HOME=$HOME LANG=$language SHELL=$shell \
+    PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib $script_dir/MacOS/Grass.sh"
+end tell
+EOF

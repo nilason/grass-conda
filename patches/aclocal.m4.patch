@@ -1,0 +1,13 @@
+--- aclocal.m4.orig	2020-07-24 08:20:51.000000000 +0200
++++ aclocal.m4	2020-07-25 14:54:12.000000000 +0200
+@@ -510,8 +510,8 @@
+ 	*-apple-darwin*)
+ 	    SHLIB_CFLAGS="-fno-common"
+ 	    SHLIB_SUFFIX=".dylib"
+-	    SHLIB_LD="${CC} -dynamiclib -compatibility_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -current_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -install_name \${INST_DIR}/lib/lib\${LIB_NAME}\${SHLIB_SUFFIX}"
+-	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
++	    SHLIB_LD="${CC} -dynamiclib -compatibility_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -current_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -install_name @rpath/lib\${LIB_NAME}\${SHLIB_SUFFIX}"
++	    LD_LIBRARY_PATH_VAR="LD_RUN_PATH"
+ 	    ;;
+ 	*-sun-solaris*)
+ 	    # Note: If _REENTRANT isn't defined, then Solaris
