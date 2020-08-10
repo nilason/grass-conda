@@ -162,7 +162,7 @@ fi
 
 if [ `conda env list | grep -o "^$CONDA_ENV " | wc -l` -eq 0 ]; then
     echo "Error, could not find conda environment \"$CONDA_ENV\""
-    exit_nice 1 
+    exit_nice 1
 fi
 
 read_grass_version
@@ -189,6 +189,11 @@ if [ ! -f "$THIS_SCRIPT_DIR/miniconda3.sh" ]; then
 fi
 
 # Conda stuff
+
+if [ ! -f ~/opt/anaconda3/etc/profile.d/conda.sh ]; then
+    echo "Error: failed to locate the \"anaconda3/etc/profile.d/conda.sh\""
+    exit_nice 1
+fi
 . ~/opt/anaconda3/etc/profile.d/conda.sh
 conda activate $CONDA_ENV
 if [ $? -ne 0 ]; then
