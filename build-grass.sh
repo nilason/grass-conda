@@ -208,9 +208,9 @@ cd "$GRASSDIR"
 make distclean &>/dev/null
 export BUILD_SDK=$SDK
 . "$THIS_SCRIPT_DIR/configure-grass.sh"
-make -j4  GDAL_DYNAMIC=
+make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
 echo "Start installation:"
-sudo make -j4 install
+sudo make install
 
 # replace SDK with a general Command Line Tool one
 FILE=/Applications/$GRASS_APP_NAME/Contents/Resources/include/Make/Platform.make
