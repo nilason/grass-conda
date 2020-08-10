@@ -45,6 +45,8 @@ Arguments:
   --grassdir  GRASS GIS source directory
   -s
   --sdk       MacOS SDK
+  -c
+  --conda-env Conda environment name
   -help       Usage information
 Example:
   sudo ./$THIS_SCRIPT
