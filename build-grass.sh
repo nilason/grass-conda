@@ -212,7 +212,13 @@ make -j4  GDAL_DYNAMIC=
 echo "Start installation:"
 sudo make -j4 install
 
+# replace SDK with a general Command Line Tool one
+FILE=/Applications/$GRASS_APP_NAME/Contents/Resources/include/Make/Platform.make
+sudo sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" $FILE
+if [ $? -eq 0 ]; then
+    sudo rm -f $FILE.bak
+fi
+
 sudo rm -r /Applications/$GRASS_APP_NAME/Contents/Resources/pkgs
 sudo chown -R root:wheel /Applications/$GRASS_APP_NAME
-
 exit 0
