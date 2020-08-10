@@ -47,7 +47,8 @@ Arguments:
   --sdk       MacOS SDK
   -c
   --conda-env Conda environment name
-  -help       Usage information
+  -h
+  --help      Usage information
 Example:
   ./$THIS_SCRIPT
   ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
