@@ -60,7 +60,6 @@ function exit_nice () {
 	error_code=$1
 	exit $error_code
 }
-# ver=$(cat dist.x86_64-apple-darwin19.6.0/etc/VERSIONNUMBER | awk -F. '{print $1$2}')
 
 function read_grass_version () {
     local versionfile="$GRASSDIR/include/VERSION"
@@ -116,11 +115,9 @@ while [ "$1" != "" ]; do
     case $1 in
         -s | --sdk ) shift
         SDK=$1
-        # SDK=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
         ;;
         -g | --grassdir ) shift
         GRASSDIR=$1
-        # GRASSDIR=`echo $i | sed 's/[-a-zA-Z0-9]*=//'`
         ;;
         -h | --help )
         display_usage
@@ -156,11 +153,6 @@ if [ ! -d  "$GRASSDIR" ]; then
     display_usage
     exit_nice 1
 fi
-
-echo "script:       <$THIS_SCRIPT>"
-echo "script dir:   <$THIS_SCRIPT_DIR>"
-echo "SDK:          <$SDK>"
-echo "grass source: <$GRASSDIR>"
 
 # check if conda is available
 if ! type conda &>/dev/null ; then
