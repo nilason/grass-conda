@@ -49,8 +49,8 @@ Arguments:
   --conda-env Conda environment name
   -help       Usage information
 Example:
-  sudo ./$THIS_SCRIPT
-  sudo ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
+  ./$THIS_SCRIPT
+  ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
       -g /Volumes/dev/grass
 _EOF_
 }
