@@ -1,0 +1,12 @@
+--- include/Make/Install.make	2020-08-11 16:04:57.000000000 +0200
++++ include/Make/Install.make	2020-08-11 16:20:27.000000000 +0200
+@@ -117,7 +117,8 @@
+ 
+ ifneq ($(findstring darwin,$(ARCH)),)
+ 	@# enable OSX Help Viewer
+-	@/bin/ln -sfh "$(INST_DIR)/docs/html" /Library/Documentation/Help/GRASS-$(GRASS_VERSION_MAJOR).$(GRASS_VERSION_MINOR)
++	@echo "=== NOT INSTALLING OSX Help Viewer DOCS ==="
++	@# /bin/ln -sfh "$(INST_DIR)/docs/html" /Library/Documentation/Help/GRASS-$(GRASS_VERSION_MAJOR).$(GRASS_VERSION_MINOR)
+ endif
+ 
+ $(INST_DIR) $(UNIX_BIN):
