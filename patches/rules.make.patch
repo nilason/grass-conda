@@ -1,6 +1,6 @@
---- include/Make/Rules.make	2015-12-19 13:02:11.000000000 -0700
-+++ include/Make/Rules.make	2017-08-23 11:37:17.000000000 -0600
-@@ -36,8 +36,8 @@
+--- include/Make/Rules.make.orig	2020-08-11 11:06:04.000000000 +0200
++++ include/Make/Rules.make	2020-08-11 11:28:35.000000000 +0200
+@@ -46,8 +46,8 @@
  	GISRC=$(RUN_GISRC) \
  	GISBASE=$(RUN_GISBASE) \
  	PATH="$(ARCH_DISTDIR)/bin:$(GISBASE)/bin:$(GISBASE)/scripts:$$PATH" \

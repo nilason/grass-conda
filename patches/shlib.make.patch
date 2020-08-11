@@ -1,8 +1,8 @@
---- include/Make/Shlib.make	2011-05-21 03:35:08.000000000 -0600
-+++ include/Make/Shlib.make	2017-12-19 14:03:53.000000000 -0700
+--- include/Make/Shlib.make.orig	2020-08-11 11:06:04.000000000 +0200
++++ include/Make/Shlib.make	2020-08-11 11:17:06.000000000 +0200
 @@ -11,5 +11,6 @@
  ifndef MINGW
- 	(cd $(ARCH_LIBDIR); ln -f -s $(notdir $@) $(patsubst %.$(GRASS_VERSION_NUMBER)$(SHLIB_SUFFIX),%$(SHLIB_SUFFIX),$@))
+ 	(cd $(ARCH_LIBDIR); ln -f -s $(notdir $@) $(patsubst %.$(GRASS_LIB_VERSION_NUMBER)$(SHLIB_SUFFIX),%$(SHLIB_SUFFIX),$@))
  endif
 +	install_name_tool -change libgdal.20.dylib @rpath/libgdal.20.dylib $@
  
