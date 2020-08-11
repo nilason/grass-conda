@@ -5,7 +5,7 @@ export PATH=$PREFIX/bin:/usr/bin:/bin:/usr/sbin:/etc:/usr/lib
 export GRASS_PYTHON=$(which pythonw)
 export CC=$PREFIX/bin/clang
 export CXX=$PREFIX/bin/clang++
-export MACOSX_DEPLOYMENT_TARGET=10.14
+export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
 
@@ -62,12 +62,7 @@ CONFIGURE_FLAGS="\
   --with-pdal-libs=$PREFIX/lib \
   --with-readline \
   --with-readline-includes=$PREFIX/include/readline \
-  --with-readline-libs=$PREFIX/lib     
+  --with-readline-libs=$PREFIX/lib
 "
 
 ./configure $CONFIGURE_FLAGS
-
-# --without-readline \
-# --with-readline \
-# --with-readline-includes=$PREFIX/include/readline \
-# --with-readline-libs=$PREFIX/lib
