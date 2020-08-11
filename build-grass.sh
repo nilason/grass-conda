@@ -28,6 +28,8 @@ GRASSDIR=
 DEPLOYMENT_TARGET=
 GRASS_VER_MAJ=""
 GRASS_VER_MIN=""
+GRASS_VER_PATCH=
+PATCH_DIR=
 GRASS_APP_NAME=""
 CONDA_ENV=
 CONDA_REQ_FILE="conda-requirements.txt"
@@ -79,6 +81,13 @@ function read_grass_version () {
     done < $versionfile
     GRASS_VER_MAJ=${arr[0]}
     GRASS_VER_MIN=${arr[1]}
+    GRASS_VER_PATCH=${arr[2]}
+    PATCH_DIR=$GRASS_VER_MAJ.$GRASS_VER_MIN.$GRASS_VER_PATCH
+    echo PATCH_DIR:$PATCH_DIR
+    if [ ! -d  "$THIS_SCRIPT_DIR/patches/$PATCH_DIR" ]; then
+        echo "Error, no patch directory \"$THIS_SCRIPT_DIR/patches/$PATCH_DIR\" found"
+        exit_nice 1
+    fi
     GRASS_APP_NAME="GRASS-$GRASS_VER_MAJ.$GRASS_VER_MIN.app"
 }
 
@@ -111,30 +120,20 @@ function make_app_bundle_dir () {
 
 function patch_grass () {
     cd "$GRASSDIR"
-    local patches_dir="$THIS_SCRIPT_DIR/patches"
-    patch -p0 < "$patches_dir/aclocal.m4.patch"
-    patch -p0 < "$patches_dir/configure.patch"
-    patch -p0 < "$patches_dir/install.make.patch"
-    patch -p0 < "$patches_dir/loader.py.patch"
-    patch -p0 < "$patches_dir/module.make.patch"
-    patch -p0 < "$patches_dir/platform.make.in.patch"
-    patch -p0 < "$patches_dir/rules.make.patch"
-    patch -p0 < "$patches_dir/shlib.make.patch"
+    local patches_dir="$THIS_SCRIPT_DIR/patches/$PATCH_DIR"
+    for patchfile in $patches_dir/*.patch; do
+        patch -p0 < $patchfile
+    done
     cd "$THIS_SCRIPT_DIR"
 }
 
 function reset_grass_patches () {
     echo "Reverting patches..."
     cd "$GRASSDIR"
-    local patches_dir="$THIS_SCRIPT_DIR/patches"
-    patch -R -p0 < "$patches_dir/aclocal.m4.patch"
-    patch -R -p0 < "$patches_dir/configure.patch"
-    patch -R -p0 < "$patches_dir/install.make.patch"
-    patch -R -p0 < "$patches_dir/loader.py.patch"
-    patch -R -p0 < "$patches_dir/module.make.patch"
-    patch -R -p0 < "$patches_dir/platform.make.in.patch"
-    patch -R -p0 < "$patches_dir/rules.make.patch"
-    patch -R -p0 < "$patches_dir/shlib.make.patch"
+    local patches_dir="$THIS_SCRIPT_DIR/patches/$PATCH_DIR"
+    for patchfile in $patches_dir/*.patch; do
+        patch  -R -p0 < $patchfile
+    done
     echo "Reverting patches done."
     cd "$THIS_SCRIPT_DIR"
 }
