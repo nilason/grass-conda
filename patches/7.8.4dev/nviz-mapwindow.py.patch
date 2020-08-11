@@ -1,0 +1,11 @@
+--- gui/wxpython/nviz/mapwindow.py.orig	2020-07-23 11:00:18.000000000 +0200
++++ gui/wxpython/nviz/mapwindow.py	2020-07-26 09:29:17.000000000 +0200
+@@ -405,7 +405,7 @@
+                 self.SetCurrent()
+             self._display.ResizeWindow(size.width,
+                                        size.height,
+-                                       self.GetContentScaleFactor())
++                                       1)
+ 
+             # reposition checkbox in statusbar
+             self.parent.StatusbarReposition()
