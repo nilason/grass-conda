@@ -33,6 +33,10 @@ PATCH_DIR=
 GRASS_APP_NAME=""
 CONDA_ENV=
 CONDA_REQ_FILE="conda-requirements.txt"
+DMG_TITLE=
+DMG_NAME=
+DMG_OUT_DIR=
+REPACKAGE=0
 
 # read in configurations
 . configure-build.sh
@@ -42,6 +46,7 @@ CONDA_REQ_FILE="conda-requirements.txt"
 #############################################################################
 
 function display_usage () { cat <<- _EOF_
+
 GRASS GIS build script for Anaconda.
 
 Description...
@@ -49,19 +54,27 @@ Description...
 Usage:  $THIS_SCRIPT [arguments]
 Arguments:
   -g
-  --grassdir  GRASS GIS source directory
+  --grassdir    [path] GRASS GIS source directory
   -s
-  --sdk       MacOS SDK - full path
+  --sdk         [path] MacOS SDK - full path
   -t
-  --target    Set deployment target version (MACOSX_DEPLOYMENT_TARGET), e.g. "10.14"
+  --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
+                       e.g. "10.14"
   -c
-  --conda-env Conda environment name
+  --conda-env          Conda environment name
+  -o
+  --dmg-out-dir [path] Output directory path for DMG file creation
+                       This is a requirement for creating .dmg files.
+  -r
+  --repackage          Recreate dmg file from previously built app,
+                       setting [-o | --dmg-out-dir] is a requirement.
   -h
-  --help      Usage information
+  --help               Usage information
 Example:
   ./$THIS_SCRIPT
-  ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
+  ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \\
       -g /Volumes/dev/grass
+
 _EOF_
 }
 
@@ -83,12 +96,13 @@ function read_grass_version () {
     GRASS_VER_MIN=${arr[1]}
     GRASS_VER_PATCH=${arr[2]}
     PATCH_DIR=$GRASS_VER_MAJ.$GRASS_VER_MIN.$GRASS_VER_PATCH
-    echo PATCH_DIR:$PATCH_DIR
     if [ ! -d  "$THIS_SCRIPT_DIR/patches/$PATCH_DIR" ]; then
         echo "Error, no patch directory \"$THIS_SCRIPT_DIR/patches/$PATCH_DIR\" found"
         exit_nice 1
     fi
     GRASS_APP_NAME="GRASS-$GRASS_VER_MAJ.$GRASS_VER_MIN.app"
+    DMG_TITLE="GRASS-GIS-${GRASS_VER_MAJ}.${GRASS_VER_MIN}.${GRASS_VER_PATCH}"
+    DMG_NAME="grass-${GRASS_VER_MAJ}.${GRASS_VER_MIN}.${GRASS_VER_PATCH}.dmg"
 }
 
 function make_app_bundle_dir () {
@@ -168,6 +182,46 @@ function set_up_conda () {
     fi
 }
 
+function create_dmg () {
+    local app_bundle="/Applications/$GRASS_APP_NAME"
+    echo
+    echo "Create dmg file of $app_bundle ..."
+
+    if [ ! -d  "$app_bundle" ]; then
+        echo "Error, attempt to create dmg file, but no app could be found"
+        exit_nice 1
+    fi
+
+    local tmpdir=`mktemp -d /tmp/org.osgeo.grass.XXXXXX`
+    local dmg_tmpfile=grass-tmp-$$.dmg
+    local exact_app_size=`du -ks $app_bundle | cut -f 1`
+    local dmg_size=$((exact_app_size*115/100))
+
+    sudo hdiutil create -srcfolder $app_bundle \
+        -volname $DMG_TITLE \
+        -fs HFS+ \
+        -fsargs "-c c=64,a=16,e=16" \
+        -format UDRW \
+        -size ${dmg_size}k "${tmpdir}/${dmg_tmpfile}"
+
+    if [ $? -ne 0 ]; then
+        rm -rf $tmpdir
+        exit_nice $?
+    fi
+
+    hdiutil convert "${tmpdir}/${dmg_tmpfile}" \
+        -format UDZO -imagekey zlib-level=9 -o ${DMG_OUT_DIR}${DMG_NAME}
+
+    if [ $? -ne 0 ]; then
+        rm -rf $tmpdir
+        exit_nice $?
+    fi
+
+    rm -rf $tmpdir
+    echo
+}
+
+
 #############################################################################
 # Read script arguments
 #############################################################################
@@ -185,6 +239,12 @@ while [ "$1" != "" ]; do
         ;;
         -t | --target ) shift
         DEPLOYMENT_TARGET=$1
+        ;;
+        -o | --dmg-out-dir ) shift
+        DMG_OUT_DIR=$1
+        ;;
+        -r | --repackage )
+        REPACKAGE=1
         ;;
         -h | --help )
         display_usage
@@ -224,6 +284,28 @@ fi
 
 read_grass_version
 
+if [[ ! "$DMG_OUT_DIR" == "" && ! -d  "$DMG_OUT_DIR" ]]; then
+    echo "Error, dmg output directory \"$DMG_OUT_DIR\" does not exist."
+    exit_nice 1
+fi
+
+if [[ ! "$DMG_OUT_DIR" == "" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
+    echo "Warning, there exists a dmg file \"${DMG_NAME}\" in \"${DMG_OUT_DIR}\"."
+    while true; do
+        read -p "Do you wish to delete it (y|n)? " yn
+        case $yn in
+            [Yy]* ) sudo rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"; break;;
+            [Nn]* ) exit_nice 0;;
+            * ) echo "Please answer yes or no.";;
+        esac
+    done
+fi
+
+if [[ "$REPACKAGE" -eq 1 && ! -d  "/Applications/$GRASS_APP_NAME" ]]; then
+    echo "Error, attept to repackage a non-existing \"/Applications/$GRASS_APP_NAME\" app bundle."
+    exit_nice 1
+fi
+
 # check if conda is available
 if ! type conda &>/dev/null ; then
     echo "Error, conda() not found, make sure to activate conda environment"
@@ -237,7 +319,7 @@ if [ `conda env list | grep -o "^$CONDA_ENV " | wc -l` -eq 0 ]; then
 fi
 
 # check if destination app bundle exists, with option to cancel if true
-if [ -d  "/Applications/$GRASS_APP_NAME" ]; then
+if [[ -d  "/Applications/$GRASS_APP_NAME" && "$REPACKAGE" -eq 0 ]]; then
     echo "Warning, \"/Applications/$GRASS_APP_NAME\" already exists."
     while true; do
         read -p "Do you wish to delete it (y|n)? " yn
@@ -252,6 +334,12 @@ fi
 #############################################################################
 # Start setting up and compiling procedures
 #############################################################################
+
+# only create a new dmg file of existing app bundle
+if [[ ! "$DMG_OUT_DIR" == "" && "$REPACKAGE" -eq 1 ]]; then
+    create_dmg
+    exit_nice 0
+fi
 
 make_app_bundle_dir
 
@@ -291,5 +379,10 @@ sudo rm -r /Applications/$GRASS_APP_NAME/Contents/Resources/pkgs
 
 # set app owner
 sudo chown -R root:wheel /Applications/$GRASS_APP_NAME
+
+# create dmg file
+if [[ ! "$DMG_OUT_DIR" == "" ]]; then
+    create_dmg
+fi
 
 exit_nice 0 cleanup
