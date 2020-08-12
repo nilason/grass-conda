@@ -1,11 +1,11 @@
 # Build GRASS GIS with Anaconda
 
-This is a script package for nearly automated build of GRASS GIS as an macOS
+This is a script package for nearly automated build of GRASS GIS as a macOS
 application bundle (GRASS-x.x.app).
 
 ## Prerequisites
 
-Installation of Anaconda for macOS https://www.anaconda.com/
+Installation of Anaconda for macOS https://www.anaconda.com/.
 
 Create conda environment, e.g.:
 ```
