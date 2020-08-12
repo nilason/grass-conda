@@ -29,3 +29,5 @@ zstd
 pdal
 ply
 svn
+postgresql
+postgis

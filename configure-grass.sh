@@ -31,7 +31,9 @@ CONFIGURE_FLAGS="\
   --with-png-libs=$PREFIX/lib \
   --with-tiff-includes=$PREFIX/include \
   --with-tiff-libs=$PREFIX/lib \
-  --without-postgres \
+  --with-postgres=yes \
+  --with-postgres-includes=$PREFIX/include \
+  --with-postgres-libs=$PREFIX/lib \
   --without-mysql \
   --with-sqlite \
   --with-sqlite-libs=$PREFIX/lib \
