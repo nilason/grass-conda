@@ -4,8 +4,8 @@ This is a script package for nearly automated build of GRASS GIS as a macOS
 application bundle (GRASS-x.x.app).
 
 The building script `build-grass.sh` will do all the steps – from activating
-conda environment, creating App bundle, installing miniconda and dependencies to compiling
-and installing GRASS GIS – to end up with an installed GRASS.app in
+conda environment, creating App bundle, installing miniconda and dependencies to
+compiling and installing GRASS GIS – to end up with an installed GRASS.app in
 `/Applications`. It can also create a compressed dmg file if so wished.
 
 
@@ -20,7 +20,7 @@ Arguments:
   --sdk         [path] MacOS SDK - full path
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
-                       e.g. "10.14"
+                       e.g. "10.14", optional, default is set from SDK
   -c
   --conda-env          Conda environment name
   -o
@@ -59,7 +59,6 @@ You can also do `./build-grass.sh --help` for info on possible configurations.
 Required settings:
 
 - SDK full path to the SDK that will be set to -isysroot
-- DEPLOYMENT_TARGET this will set MACOSX_DEPLOYMENT_TARGET
 - GRASSDIR full path to the GRASS GIS source directory
 - CONDA_ENV name of conda environment
 
@@ -88,7 +87,6 @@ cd [grass-conda-directory]
 ./build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
-  --target 10.14 \
   --conda-env anaconda_p37 \
   --dmg-out-dir ~/Desktop
 ```
