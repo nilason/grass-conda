@@ -55,14 +55,14 @@ Description...
 Usage:  $THIS_SCRIPT [arguments]
 Arguments:
   -g
-  --grassdir    [path] GRASS GIS source directory
+  --grassdir    [path] GRASS GIS source directory, required
   -s
-  --sdk         [path] MacOS SDK - full path
+  --sdk         [path] MacOS SDK - full path, required
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
                        e.g. "10.14", optional, default is set from SDK
   -c
-  --conda-env          Conda environment name
+  --conda-env          Conda environment name, required
   -o
   --dmg-out-dir [path] Output directory path for DMG file creation
                        This is a requirement for creating .dmg files.
