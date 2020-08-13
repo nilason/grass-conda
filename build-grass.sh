@@ -26,9 +26,10 @@ THIS_SCRIPT_DIR=`pwd`
 SDK=
 GRASSDIR=
 DEPLOYMENT_TARGET=
-GRASS_VER_MAJ=""
-GRASS_VER_MIN=""
-GRASS_VER_PATCH=
+GRASS_VERSION_MAJOR=""
+GRASS_VERSION_MINOR=""
+GRASS_VERSION_RELEASE=
+GRASS_BUILD_YEAR=
 PATCH_DIR=
 GRASS_APP_NAME=""
 CONDA_ENV=
@@ -92,17 +93,18 @@ function read_grass_version () {
     while read line; do
         arr+=("$line")
     done < $versionfile
-    GRASS_VER_MAJ=${arr[0]}
-    GRASS_VER_MIN=${arr[1]}
-    GRASS_VER_PATCH=${arr[2]}
-    PATCH_DIR=$GRASS_VER_MAJ.$GRASS_VER_MIN.$GRASS_VER_PATCH
+    GRASS_VERSION_MAJOR=${arr[0]}
+    GRASS_VERSION_MINOR=${arr[1]}
+    GRASS_VERSION_RELEASE=${arr[2]}
+    GRASS_BUILD_YEAR=${arr[3]}
+    PATCH_DIR=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
     if [ ! -d  "$THIS_SCRIPT_DIR/patches/$PATCH_DIR" ]; then
         echo "Error, no patch directory \"$THIS_SCRIPT_DIR/patches/$PATCH_DIR\" found"
         exit_nice 1
     fi
-    GRASS_APP_NAME="GRASS-$GRASS_VER_MAJ.$GRASS_VER_MIN.app"
-    DMG_TITLE="GRASS-GIS-${GRASS_VER_MAJ}.${GRASS_VER_MIN}.${GRASS_VER_PATCH}"
-    DMG_NAME="grass-${GRASS_VER_MAJ}.${GRASS_VER_MIN}.${GRASS_VER_PATCH}.dmg"
+    GRASS_APP_NAME="GRASS-$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.app"
+    DMG_TITLE="GRASS-GIS-${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}"
+    DMG_NAME="grass-${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}.dmg"
 }
 
 function make_app_bundle_dir () {
@@ -113,9 +115,16 @@ function make_app_bundle_dir () {
     mkdir -m 0755 $resources_dir
     mkdir -m 0755 $macos_dir
 
-    sed "s|@@GRASSVERSION@@|$GRASS_VER_MAJ.$GRASS_VER_MIN|g" \
-        ./files/Info.plist.in > "$contents_dir/Info.plist"
-    sed "s|@@GRASSBIN@@|grass$GRASS_VER_MAJ$GRASS_VER_MIN|g" \
+    sed "s|@GRASS_BUILD_YEAR@|$GRASS_BUILD_YEAR|g" ./files/Info.plist.in | \
+        sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
+        sed "s|@GRASS_VERSION_MINOR@|$GRASS_VERSION_MINOR|g" | \
+        sed "s|@GRASS_VERSION_RELEASE@|$GRASS_VERSION_RELEASE|g" | \
+        sed "s|@DEPLOYMENT_TARGET@|$DEPLOYMENT_TARGET|g" \
+            > "$contents_dir/Info.plist"
+
+    # sed "s|@@GRASSVERSION@@|$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR|g" \
+    #     ./files/Info.plist.in > "$contents_dir/Info.plist"
+    sed "s|@GRASSBIN@|grass$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR|g" \
         ./files/Grass.sh.in > "$macos_dir/Grass.sh"
     cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
         "$macos_dir/build_gui_user_menu.sh"
