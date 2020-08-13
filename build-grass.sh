@@ -114,7 +114,7 @@ function make_app_bundle_dir () {
     mkdir -m 0755 $macos_dir
 
     sed "s|@@GRASSVERSION@@|$GRASS_VER_MAJ.$GRASS_VER_MIN|g" \
-        ./files/Info.plist > "$contents_dir/Info.plist"
+        ./files/Info.plist.in > "$contents_dir/Info.plist"
     sed "s|@@GRASSBIN@@|grass$GRASS_VER_MAJ$GRASS_VER_MIN|g" \
         ./files/Grass.sh > "$macos_dir/Grass.sh"
     cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
