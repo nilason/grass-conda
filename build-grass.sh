@@ -122,7 +122,6 @@ function set_bundle_version () {
     fi
 
     if [[ $GRASS_VERSION_RELEASE == *"dev"* ]]; then
-        echo "It's dev release!"
         local now=`git log -1 --format=%at`
         local start=`git log -1 --format=%at 7.8.3`
         local build_no=$(((now-start)/60/60/24))
