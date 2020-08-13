@@ -37,6 +37,7 @@ CONDA_REQ_FILE="conda-requirements.txt"
 DMG_TITLE=
 DMG_NAME=
 DMG_OUT_DIR=
+BUNDLE_VERSION=
 REPACKAGE=0
 
 # read in configurations
@@ -108,6 +109,30 @@ function read_grass_version () {
     DMG_NAME="grass-${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}.dmg"
 }
 
+# This set the build version for CFBundleVersion, in case of dev version the
+# build number is calculated in days since last stable release,
+# eg. 7.8.4dev -> 7.8.4d50, where 50 is the number of days. This is to comply
+# with Apple guidelines and to be able to compare versions.
+function set_bundle_version () {
+    cd "$GRASSDIR"
+    BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
+
+    if [[ ! -d "$GRASSDIR/.git" ]]; then
+        return
+    fi
+
+    if [[ $GRASS_VERSION_RELEASE == *"dev"* ]]; then
+        echo "It's dev release!"
+        local now=`git log -1 --format=%at`
+        local start=`git log -1 --format=%at 7.8.3`
+        local build_no=$(((now-start)/60/60/24))
+        local patchno=`echo $GRASS_VERSION_RELEASE | awk -Fd '{print $1}'`
+        if [[ "$patchno" == "" ]]; then patchno=0; fi
+        BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.${patchno}d$build_no
+    fi
+    cd "$THIS_SCRIPT_DIR"
+}
+
 function make_app_bundle_dir () {
     local contents_dir="/Applications/$GRASS_APP_NAME/Contents"
     local resources_dir="/Applications/$GRASS_APP_NAME/Contents/Resources"
@@ -120,11 +145,10 @@ function make_app_bundle_dir () {
         sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
         sed "s|@GRASS_VERSION_MINOR@|$GRASS_VERSION_MINOR|g" | \
         sed "s|@GRASS_VERSION_RELEASE@|$GRASS_VERSION_RELEASE|g" | \
+        sed "s|@BUNDLE_VERSION@|$BUNDLE_VERSION|g" | \
         sed "s|@DEPLOYMENT_TARGET@|$DEPLOYMENT_TARGET|g" \
             > "$contents_dir/Info.plist"
 
-    # sed "s|@@GRASSVERSION@@|$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR|g" \
-    #     ./files/Info.plist.in > "$contents_dir/Info.plist"
     sed "s|@GRASSBIN@|grass$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR|g" \
         ./files/Grass.sh.in > "$macos_dir/Grass.sh"
     cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
@@ -177,7 +201,6 @@ function set_up_conda () {
     # a hack, this is needed to enable `conda activate` in bash script
     # see https://github.com/conda/conda/issues/7980
     . $(conda info --base)/etc/profile.d/conda.sh
-    # . ~/opt/anaconda3/etc/profile.d/conda.sh
     conda activate $CONDA_ENV
     if [ $? -ne 0 ]; then
         exit_nice $? cleanup
@@ -299,6 +322,7 @@ if [ ! -d  "$GRASSDIR" ]; then
 fi
 
 read_grass_version
+set_bundle_version
 
 if [[ ! "$DMG_OUT_DIR" == "" && ! -d  "$DMG_OUT_DIR" ]]; then
     echo "Error, dmg output directory \"$DMG_OUT_DIR\" does not exist."
