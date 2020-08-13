@@ -285,6 +285,12 @@ if [ ! -d  "$SDK" ]; then
     exit_nice 1
 fi
 
+# if DEPLOYMENT_TARGET hasn't been set, extract from SDK
+if [[ $DEPLOYMENT_TARGET == "" ]]; then
+    DEPLOYMENT_TARGET=`plutil -extract DefaultProperties.MACOSX_DEPLOYMENT_TARGET xml1 \
+        -o - $SDK/SDKSettings.plist | awk -F '[<>]' '/string/{print $3}'`
+fi
+
 if [ ! -d  "$GRASSDIR" ]; then
     echo "Error, --g argument required, could not find GRASS source directory"
     display_usage

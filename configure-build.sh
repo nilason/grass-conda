@@ -3,8 +3,9 @@
 # full path to the SDK to build with
 SDK="/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk"
 
-# this will set MACOSX_DEPLOYMENT_TARGET
-DEPLOYMENT_TARGET=10.14
+# setting DEPLOYMENT_TARGET here is optional (MACOSX_DEPLOYMENT_TARGET
+# of the SDK is the default) this will set MACOSX_DEPLOYMENT_TARGET
+# DEPLOYMENT_TARGET=10.14
 
 # full path to GRASS GIS source directory
 GRASSDIR=""
