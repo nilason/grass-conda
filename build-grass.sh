@@ -60,7 +60,7 @@ Arguments:
   --sdk         [path] MacOS SDK - full path
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
-                       e.g. "10.14"
+                       e.g. "10.14", optional, default is set from SDK
   -c
   --conda-env          Conda environment name
   -o
@@ -71,6 +71,7 @@ Arguments:
                        setting [-o | --dmg-out-dir] is a requirement.
   -h
   --help               Usage information
+
 Example:
   ./$THIS_SCRIPT
   ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \\
