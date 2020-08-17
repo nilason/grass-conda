@@ -117,7 +117,8 @@ function set_bundle_version () {
     cd "$GRASSDIR"
     BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
 
-    if [[ ! -d "$GRASSDIR/.git" ]]; then
+    is_git_repo=`git rev-parse --is-inside-work-tree 2> /dev/null`
+    if [[ ! $? -eq 0 && ! "$is_git_repo" == "true" ]]; then
         cd "$THIS_SCRIPT_DIR"
         return
     fi
