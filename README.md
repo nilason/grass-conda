@@ -5,8 +5,9 @@ application bundle (GRASS-x.x.app).
 
 The building script `build-grass.sh` will do all the steps – from activating
 conda environment, creating App bundle, installing miniconda and dependencies to
-compiling and installing GRASS GIS – to end up with an installed GRASS.app in
-`/Applications`. It can also create a compressed dmg file if so wished.
+patching, compiling and installing GRASS GIS – to end up with an installed
+GRASS.app in `/Applications`. It can also create a compressed dmg file if so
+wished.
 
 
 Usage:
