@@ -118,6 +118,7 @@ function set_bundle_version () {
     BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
 
     if [[ ! -d "$GRASSDIR/.git" ]]; then
+        cd "$THIS_SCRIPT_DIR"
         return
     fi
 
