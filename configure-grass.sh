@@ -45,7 +45,6 @@ CONFIGURE_FLAGS="\
   --with-cairo-includes=$PREFIX/include/cairo \
   --with-cairo-libs=$PREFIX/lib \
   --with-cairo-ldflags="-lcairo" \
-  --without-readline \
   --with-zstd \
   --with-zstd-libs=$PREFIX/lib \
   --with-zstd-includes=$PREFIX/include \
