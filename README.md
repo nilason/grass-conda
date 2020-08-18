@@ -16,9 +16,9 @@ Usage:
 
 Arguments:
   -g
-  --grassdir    [path] GRASS GIS source directory
+  --grassdir    [path] GRASS GIS source directory, spaces in path not allowed
   -s
-  --sdk         [path] MacOS SDK - full path
+  --sdk         [path] MacOS SDK - full path, spaces in path not allowed
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
                        e.g. "10.14", optional, default is set from SDK
@@ -59,8 +59,10 @@ You can also do `./build-grass.sh --help` for info on possible configurations.
 
 Required settings:
 
-- SDK full path to the SDK that will be set to -isysroot
-- GRASSDIR full path to the GRASS GIS source directory
+- SDK full path to the SDK that will be set to -isysroot (path may **not**
+  contain spaces)
+- GRASSDIR full path to the GRASS GIS source directory (path may **not**
+  contain spaces)
 - CONDA_ENV name of conda environment
 
 Example with using settings in `configure-build.sh`:

@@ -56,9 +56,11 @@ Description...
 Usage:  $THIS_SCRIPT [arguments]
 Arguments:
   -g
-  --grassdir    [path] GRASS GIS source directory, required
+  --grassdir    [path] GRASS GIS source directory, required, spaces in path not
+                       allowed
   -s
-  --sdk         [path] MacOS SDK - full path, required
+  --sdk         [path] MacOS SDK - full path to the SDK, which will be set as
+                       -isysroot, required, spaces in path not allowed
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
                        e.g. "10.14", optional, default is set from SDK
