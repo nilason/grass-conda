@@ -90,11 +90,11 @@ function exit_nice () {
 }
 
 function read_grass_version () {
-    local versionfile="$GRASSDIR/include/VERSION"
+    local versionfile="${GRASSDIR}/include/VERSION"
     local arr=()
     while read line; do
         arr+=("$line")
-    done < $versionfile
+    done < "$versionfile"
     GRASS_VERSION_MAJOR=${arr[0]}
     GRASS_VERSION_MINOR=${arr[1]}
     GRASS_VERSION_RELEASE=${arr[2]}
@@ -138,9 +138,9 @@ function make_app_bundle_dir () {
     local contents_dir="/Applications/$GRASS_APP_NAME/Contents"
     local resources_dir="/Applications/$GRASS_APP_NAME/Contents/Resources"
     local macos_dir="/Applications/$GRASS_APP_NAME/Contents/MacOS"
-    mkdir -p -m 0755 $contents_dir
-    mkdir -m 0755 $resources_dir
-    mkdir -m 0755 $macos_dir
+    mkdir -p -m 0755 "$contents_dir"
+    mkdir -m 0755 "$resources_dir"
+    mkdir -m 0755 "$macos_dir"
 
     sed "s|@GRASS_BUILD_YEAR@|$GRASS_BUILD_YEAR|g" ./files/Info.plist.in | \
         sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
@@ -170,8 +170,8 @@ function make_app_bundle_dir () {
 function patch_grass () {
     cd "$GRASSDIR"
     local patches_dir="$THIS_SCRIPT_DIR/patches/$PATCH_DIR"
-    for patchfile in $patches_dir/*.patch; do
-        patch -p0 < $patchfile
+    for patchfile in "$patches_dir/"*.patch; do
+        patch -p0 < "$patchfile"
     done
     cd "$THIS_SCRIPT_DIR"
 }
@@ -180,8 +180,8 @@ function reset_grass_patches () {
     echo "Reverting patches..."
     cd "$GRASSDIR"
     local patches_dir="$THIS_SCRIPT_DIR/patches/$PATCH_DIR"
-    for patchfile in $patches_dir/*.patch; do
-        patch  -R -p0 < $patchfile
+    for patchfile in "$patches_dir/"*.patch; do
+        patch  -R -p0 < "$patchfile"
     done
     echo "Reverting patches done."
     cd "$THIS_SCRIPT_DIR"
@@ -208,7 +208,7 @@ function set_up_conda () {
     fi
 
     $BASH miniconda3.sh -b -f -p "/Applications/$GRASS_APP_NAME/Contents/Resources"
-    export PATH=/Applications/$GRASS_APP_NAME/Contents/Resources/bin:$PATH
+    export PATH="/Applications/$GRASS_APP_NAME/Contents/Resources/bin:$PATH"
     conda install --yes -p "/Applications/$GRASS_APP_NAME/Contents/Resources" \
         --file=$CONDA_REQ_FILE -c conda-forge
     if [ $? -ne 0 ]; then
@@ -244,7 +244,7 @@ function create_dmg () {
     fi
 
     hdiutil convert "${tmpdir}/${dmg_tmpfile}" \
-        -format UDZO -imagekey zlib-level=9 -o ${DMG_OUT_DIR}${DMG_NAME}
+        -format UDZO -imagekey zlib-level=9 -o "${DMG_OUT_DIR}/${DMG_NAME}"
 
     if [ $? -ne 0 ]; then
         rm -rf $tmpdir
