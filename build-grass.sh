@@ -231,7 +231,7 @@ function create_dmg () {
     local exact_app_size=`du -ks $app_bundle | cut -f 1`
     local dmg_size=$((exact_app_size*115/100))
 
-    sudo hdiutil create -srcfolder $app_bundle \
+    hdiutil create -srcfolder $app_bundle \
         -volname $DMG_TITLE \
         -fs HFS+ \
         -fsargs "-c c=64,a=16,e=16" \
@@ -335,7 +335,7 @@ if [[ ! "$DMG_OUT_DIR" == "" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
     while true; do
         read -p "Do you wish to delete it (y|n)? " yn
         case $yn in
-            [Yy]* ) sudo rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"; break;;
+            [Yy]* ) rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"; break;;
             [Nn]* ) exit_nice 0;;
             * ) echo "Please answer yes or no.";;
         esac
@@ -365,7 +365,7 @@ if [[ -d  "/Applications/$GRASS_APP_NAME" && "$REPACKAGE" -eq 0 ]]; then
     while true; do
         read -p "Do you wish to delete it (y|n)? " yn
         case $yn in
-            [Yy]* ) sudo rm -rf "/Applications/$GRASS_APP_NAME"; break;;
+            [Yy]* ) rm -rf "/Applications/$GRASS_APP_NAME"; break;;
             [Nn]* ) exit_nice 0;;
             * ) echo "Please answer yes or no.";;
         esac
@@ -406,20 +406,17 @@ make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
 
 echo
 echo "Start installation:"
-sudo make install
+make install
 
 # replace SDK with a unversioned one of Command Line Tools
 FILE=/Applications/$GRASS_APP_NAME/Contents/Resources/include/Make/Platform.make
-sudo sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" $FILE
+sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" $FILE
 if [ $? -eq 0 ]; then
-    sudo rm -f $FILE.bak
+    rm -f $FILE.bak
 fi
 
 # save some disk space
-sudo rm -r /Applications/$GRASS_APP_NAME/Contents/Resources/pkgs
-
-# set app owner
-sudo chown -R root:wheel /Applications/$GRASS_APP_NAME
+rm -r /Applications/$GRASS_APP_NAME/Contents/Resources/pkgs
 
 # create dmg file
 if [[ ! "$DMG_OUT_DIR" == "" ]]; then
