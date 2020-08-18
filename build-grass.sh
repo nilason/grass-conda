@@ -115,7 +115,7 @@ function read_grass_version () {
 # with Apple guidelines and to be able to compare versions.
 function set_bundle_version () {
     cd "$GRASSDIR"
-    BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
+    BUNDLE_VERSION="${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}"
 
     is_git_repo=`git rev-parse --is-inside-work-tree 2> /dev/null`
     if [[ ! $? -eq 0 && ! "$is_git_repo" == "true" ]]; then
@@ -124,12 +124,8 @@ function set_bundle_version () {
     fi
 
     if [[ $GRASS_VERSION_RELEASE == *"dev"* ]]; then
-        local now=`git log -1 --format=%at`
-        local start=`git log -1 --format=%at 7.8.3`
-        local build_no=$(((now-start)/60/60/24))
-        local patchno=`echo $GRASS_VERSION_RELEASE | awk -Fd '{print $1}'`
-        if [[ "$patchno" == "" ]]; then patchno=0; fi
-        BUNDLE_VERSION=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.${patchno}d$build_no
+        git_commit=`git rev-parse --short HEAD`
+        BUNDLE_VERSION="${BUNDLE_VERSION} \(${git_commit}\)"
     fi
     cd "$THIS_SCRIPT_DIR"
 }
