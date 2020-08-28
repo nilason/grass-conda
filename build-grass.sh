@@ -227,7 +227,7 @@ function create_dmg () {
     local exact_app_size=`du -ks $app_bundle | cut -f 1`
     local dmg_size=$((exact_app_size*115/100))
 
-    hdiutil create -srcfolder $app_bundle \
+    sudo hdiutil create -srcfolder $app_bundle \
         -volname $DMG_TITLE \
         -fs HFS+ \
         -fsargs "-c c=64,a=16,e=16" \
