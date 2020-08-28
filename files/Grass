@@ -5,7 +5,8 @@
 script_dir=$(dirname "$(dirname "$0")")
 
 language=$(defaults read -g AppleLanguages | \
-    awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/').UTF-8
+    awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/')
+language=$(echo ${language} | cut -d \  -f 1).UTF-8
 
 shell=$(which bash)
 
@@ -16,7 +17,7 @@ LOCALE=`which locale`
 if test "$LOCALE" = ""; then
     [[ $language =~ ^[a-z]{2}\_[A-Z]{2}\.UTF-8$ ]] || language="en_US.UTF-8"
 else
-    if [ $($LOCALE -a | grep -c $language) -eq 0 ]; then
+    if [[ $($LOCALE -a | grep -c $language) -eq 0 ]]; then
         language="en_US.UTF-8"
     fi
 fi
