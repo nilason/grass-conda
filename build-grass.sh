@@ -112,9 +112,7 @@ function read_grass_version () {
 }
 
 # This set the build version for CFBundleVersion, in case of dev version the
-# build number is calculated in days since last stable release,
-# eg. 7.8.4dev -> 7.8.4d50, where 50 is the number of days. This is to comply
-# with Apple guidelines and to be able to compare versions.
+# git short commit hash number is added.
 function set_bundle_version () {
     cd "$GRASSDIR"
     BUNDLE_VERSION="${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}"
