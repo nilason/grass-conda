@@ -386,8 +386,12 @@ patch_grass
 
 set_up_conda
 
-ln -sf /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/pythonapp/Contents/* \
-    /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/Contents
+# fix for miniconda python.app installer bug
+if [[ -d /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/pythonapp/Contents ]]; then
+    mv /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/pythonapp/Contents/* \
+        /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/Contents
+    rm -rf /Applications/$GRASS_APP_NAME/Contents/Resources/python.app/pythonapp
+fi
 
 # configure and compile GRASS GIS
 cd "$GRASSDIR"
