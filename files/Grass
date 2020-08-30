@@ -16,7 +16,8 @@ LOCALE=`which locale`
 if [ "$LOCALE" = "" ]; then
     language="en_US.UTF-8"
 else
-    if [[ $($LOCALE -a | grep -c $language) -eq 0 ]]; then
+    locale_exists=$("$LOCALE" -a | grep -c "$language")
+    if [ "$locale_exists" -eq 0 ]; then
         language="en_US.UTF-8"
     fi
 fi
