@@ -339,7 +339,7 @@ if [[ ! "$DMG_OUT_DIR" == "" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
 fi
 
 if [[ "$REPACKAGE" -eq 1 && ! -d  "/Applications/$GRASS_APP_NAME" ]]; then
-    echo "Error, attept to repackage a non-existing \"/Applications/$GRASS_APP_NAME\" app bundle."
+    echo "Error, attempt to repackage a non-existing \"/Applications/$GRASS_APP_NAME\" app bundle."
     exit_nice 1
 fi
 
