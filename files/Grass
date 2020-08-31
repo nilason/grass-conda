@@ -1,17 +1,18 @@
 #!/bin/sh
-# Script: nw2
+
 # Opens a new Terminal window
 
 script_dir=$(dirname "$(dirname "$0")")
 
+# At present, this method starting with 'env -i' doesn't work with zsh.
+shell=$(which bash)
+
+# Set and check language code against 'locale'. Failed check will fallback
+# using English (US) as default.
 language=$(defaults read -g AppleLanguages | \
     awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/')
 language=$(echo ${language} | cut -d \  -f 1).UTF-8
 
-shell=$(which bash)
-
-# Check language code against 'locale'. Failed check will fallback
-# using English (US) as default.
 LOCALE=`which locale`
 if [ "$LOCALE" = "" ]; then
     language="en_US.UTF-8"
