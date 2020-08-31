@@ -26,10 +26,11 @@ THIS_SCRIPT_DIR=`pwd`
 SDK=
 GRASSDIR=
 DEPLOYMENT_TARGET=
+GRASS_VERSION=""
 GRASS_VERSION_MAJOR=""
 GRASS_VERSION_MINOR=""
 GRASS_VERSION_RELEASE=
-GRASS_BUILD_YEAR=
+GRASS_VERSION_DATE=
 PATCH_DIR=
 GRASS_APP_NAME=""
 CONDA_ENV=
@@ -100,7 +101,8 @@ function read_grass_version () {
     GRASS_VERSION_MAJOR=${arr[0]}
     GRASS_VERSION_MINOR=${arr[1]}
     GRASS_VERSION_RELEASE=${arr[2]}
-    GRASS_BUILD_YEAR=${arr[3]}
+    GRASS_VERSION_DATE=${arr[3]}
+    GRASS_VERSION="${GRASS_VERSION_MAJOR}.${GRASS_VERSION_MINOR}.${GRASS_VERSION_RELEASE}"
     PATCH_DIR=$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.$GRASS_VERSION_RELEASE
     if [ ! -d  "$THIS_SCRIPT_DIR/patches/$PATCH_DIR" ]; then
         echo "Error, no patch directory \"$THIS_SCRIPT_DIR/patches/$PATCH_DIR\" found"
@@ -138,7 +140,7 @@ function make_app_bundle_dir () {
     mkdir -m 0755 "$resources_dir"
     mkdir -m 0755 "$macos_dir"
 
-    sed "s|@GRASS_BUILD_YEAR@|$GRASS_BUILD_YEAR|g" ./files/Info.plist.in | \
+    sed "s|@GRASS_VERSION_DATE@|$GRASS_VERSION_DATE|g" ./files/Info.plist.in | \
         sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
         sed "s|@GRASS_VERSION_MINOR@|$GRASS_VERSION_MINOR|g" | \
         sed "s|@GRASS_VERSION_RELEASE@|$GRASS_VERSION_RELEASE|g" | \
@@ -153,14 +155,21 @@ function make_app_bundle_dir () {
     cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
         "$macos_dir/build_html_user_index.sh"
     cp -p ./files/Grass "$macos_dir/Grass"
-    cp -p "$GRASSDIR/macosx/app/app.icns" "$resources_dir/app.icns"
+    if [ "$GRASS_VERSION" == "7.8.3" ]; then
+        cp -p ./files/AppIcon.icns "$resources_dir/AppIcon.icns"
+    else
+        cp -p "$GRASSDIR/macosx/app/app.icns" "$resources_dir/AppIcon.icns"
+    fi
+
+    cp -p ./files/GRASSDocument_gxw.icns "$resources_dir/GRASSDocument_gxw.icns"
 
     chmod 0644 "$contents_dir/Info.plist"
     chmod 0755 "$macos_dir/build_gui_user_menu.sh"
     chmod 0755 "$macos_dir/build_html_user_index.sh"
     chmod 0755 "$macos_dir/Grass"
     chmod 0755 "$macos_dir/Grass.sh"
-    chmod 0644 "$resources_dir/app.icns"
+    chmod 0644 "$resources_dir/AppIcon.icns"
+    chmod 0644 "$resources_dir/GRASSDocument_gxw.icns"
 }
 
 function patch_grass () {

@@ -7,9 +7,9 @@
 	<key>CFBundleExecutable</key>
 	<string>Grass</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 1999–@GRASS_BUILD_YEAR@ GRASS Development Team</string>
+	<string>Copyright © 1999–@GRASS_VERSION_DATE@ GRASS Development Team</string>
 	<key>CFBundleIconFile</key>
-	<string>app.icns</string>
+	<string>AppIcon</string>
 	<key>CFBundleName</key>
 	<string>GRASS-@GRASS_VERSION_MAJOR@.@GRASS_VERSION_MINOR@</string>
 	<key>CFBundleDisplayName</key>
@@ -22,27 +22,19 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>@BUNDLE_VERSION@</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>@BUNDLE_VERSION@</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>GRASS Workspace File</string>
 			<key>CFBundleTypeExtensions</key>
 			<array>
-				<string>*</string>
+				<string>gxw</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>FolderType</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>****</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
+			<key>CFBundleTypeIconFile</key>
+			<string>GRASSDocument_gxw</string>
 		</dict>
 	</array>
 	<key>LSMinimumSystemVersion</key>
