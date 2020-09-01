@@ -458,7 +458,14 @@ if [ $? -eq 0 ]; then
 fi
 
 # save some disk space
-rm -r $GRASS_APP_BUNDLE/Contents/Resources/pkgs
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/build-1
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/conda-meta
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/condabin
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/envs
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgconfig
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgs
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/shell
+rm -rf $GRASS_APP_BUNDLE/Contents/Resources/var
 
 # create dmg file
 if [[ ! "$DMG_OUT_DIR" == "" ]]; then
