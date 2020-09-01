@@ -46,9 +46,8 @@ conda create -n anaconda_p37 python==3.7.8 anaconda
 
 ## Instructions
 
-Fork or download this grass-conda repository to local disk. In terminal `cd` to
-the grass-conda directory. Make sure you have the GRASS GIS source directory on
-local disk.
+Fork or download this grass-conda repository to local disk. Make sure you have
+the GRASS GIS source directory on local disk.
 
 There are currently four variables needed to be set either through editing the
 `configure-build.sh` file, or by giving them as arguments to the main script:
@@ -67,15 +66,12 @@ Required settings:
 
 Example with using settings in `configure-build.sh`:
 ```
-cd [grass-conda-directory]
 ./build-grass.sh
 ```
 
 
 Example with executing with arguments:
 ```
-cd [grass-conda-directory]
-
 ./build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
@@ -85,9 +81,7 @@ cd [grass-conda-directory]
 
 Example of building and creating dmg with executing with arguments:
 ```
-cd [grass-conda-directory]
-
-./build-grass.sh \
+~/scripts/grass-conda/build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
   --conda-env anaconda_p37 \
