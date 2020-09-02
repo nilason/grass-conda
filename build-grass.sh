@@ -206,7 +206,7 @@ function set_up_conda () {
     [ $? -ne 0 ] && exit_nice $? cleanup
 
     $BASH "$miniconda" -b -f -p "$GRASS_APP_BUNDLE/Contents/Resources"
-    export PATH="/$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
+    export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
     conda install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
         --file=$CONDA_REQ_FILE -c conda-forge
     [ $? -ne 0 ] && exit_nice $? cleanup
