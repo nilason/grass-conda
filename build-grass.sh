@@ -41,6 +41,7 @@ DMG_NAME=
 DMG_OUT_DIR=
 BUNDLE_VERSION=
 REPACKAGE=0
+MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
 
 # read in configurations
 . "${THIS_SCRIPT_DIR}/configure-build.sh"
@@ -87,7 +88,7 @@ _EOF_
 
 function exit_nice () {
     error_code=$1
-    if [[ "$#" -eq 2 && $2 == 'cleanup' ]]; then
+    if [[ "$#" -eq 2 && $2 = "cleanup" ]]; then
         reset_grass_patches
     fi
     exit $error_code
@@ -114,20 +115,20 @@ function read_grass_version () {
 # This set the build version for CFBundleVersion, in case of dev version the
 # git short commit hash number is added.
 function set_bundle_version () {
-    pushd "$GRASSDIR"
+    pushd "$GRASSDIR" > /dev/null
     BUNDLE_VERSION=$GRASS_VERSION
 
     local is_git_repo=`git rev-parse --is-inside-work-tree 2> /dev/null`
-    if [[ ! $? -eq 0 && ! "$is_git_repo" == "true" ]]; then
-        popd
+    if [[ ! $? -eq 0 && ! "$is_git_repo" = "true" ]]; then
+        popd > /dev/null
         return
     fi
 
-    if [[ $GRASS_VERSION_RELEASE == *"dev"* ]]; then
+    if [[ "$GRASS_VERSION_RELEASE" = *"dev"* ]]; then
         local git_commit=`git rev-parse --short HEAD`
         BUNDLE_VERSION="${BUNDLE_VERSION} \(${git_commit}\)"
     fi
-    popd
+    popd > /dev/null
 }
 
 function make_app_bundle_dir () {
@@ -154,7 +155,7 @@ function make_app_bundle_dir () {
     cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
         "$macos_dir/build_html_user_index.sh"
     cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/Grass"
-    if [ "$GRASS_VERSION" == "7.8.3" ]; then
+    if [ "$GRASS_VERSION" = "7.8.3" ]; then
         cp -p "$THIS_SCRIPT_DIR/files/AppIcon.icns" "$resources_dir/AppIcon.icns"
     else
         cp -p "$GRASSDIR/macosx/app/app.icns" "$resources_dir/AppIcon.icns"
@@ -172,29 +173,25 @@ function make_app_bundle_dir () {
 }
 
 function patch_grass () {
-    pushd "$GRASSDIR"
     for patchfile in "$PATCH_DIR/"*.patch; do
-        patch -p0 < "$patchfile"
+        patch -d "$GRASSDIR" -p0 < "$patchfile"
     done
-    popd
 }
 
 function reset_grass_patches () {
     echo "Reverting patches..."
-    pushd "$GRASSDIR"
     for patchfile in "$PATCH_DIR/"*.patch; do
-        patch  -R -p0 < "$patchfile"
+        patch -d "$GRASSDIR" -R -p0 < "$patchfile"
     done
     echo "Reverting patches done."
-    popd
 }
 
 function set_up_conda () {
     # download miniconda if not already existing
     local miniconda="$THIS_SCRIPT_DIR/miniconda3.sh"
     if [ ! -f "$miniconda" ]; then
-        curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh \
-            --output "$miniconda"
+        curl "$MINICONDA_URL" --output "$miniconda"
+        [ $? -ne 0 ] && exit_nice $? cleanup
     fi
 
     if [ ! -f "$(conda info --base)/etc/profile.d/conda.sh" ]; then
@@ -206,17 +203,13 @@ function set_up_conda () {
     # see https://github.com/conda/conda/issues/7980
     . $(conda info --base)/etc/profile.d/conda.sh
     conda activate $CONDA_ENV
-    if [ $? -ne 0 ]; then
-        exit_nice $? cleanup
-    fi
+    [ $? -ne 0 ] && exit_nice $? cleanup
 
     $BASH "$miniconda" -b -f -p "$GRASS_APP_BUNDLE/Contents/Resources"
     export PATH="/$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
     conda install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
         --file=$CONDA_REQ_FILE -c conda-forge
-    if [ $? -ne 0 ]; then
-        exit_nice $? cleanup
-    fi
+    [ $? -ne 0 ] && exit_nice $? cleanup
 }
 
 function create_dmg () {
@@ -334,14 +327,14 @@ done
 # Check arguments and files
 #############################################################################
 
-if [ ! -d  "$SDK" ]; then
-    echo "Error, could not find MacOS SDK"
+if [ ! -f  "${SDK}/SDKSettings.plist" ]; then
+    echo "Error, could not find valid MacOS SDK at $SDK"
     display_usage
     exit_nice 1
 fi
 
 # if DEPLOYMENT_TARGET hasn't been set, extract from SDK
-if [[ $DEPLOYMENT_TARGET == "" ]]; then
+if [ -z "$DEPLOYMENT_TARGET" ]; then
     DEPLOYMENT_TARGET=`plutil -extract DefaultProperties.MACOSX_DEPLOYMENT_TARGET xml1 \
         -o - $SDK/SDKSettings.plist | awk -F '[<>]' '/string/{print $3}'`
 fi
@@ -360,12 +353,12 @@ if [ ! -d  "$PATCH_DIR" ]; then
     exit_nice 1
 fi
 
-if [[ ! "$DMG_OUT_DIR" == "" && ! -d  "$DMG_OUT_DIR" ]]; then
+if [[ ! -z "$DMG_OUT_DIR" && ! -d  "$DMG_OUT_DIR" ]]; then
     echo "Error, dmg output directory \"$DMG_OUT_DIR\" does not exist."
     exit_nice 1
 fi
 
-if [[ ! "$DMG_OUT_DIR" == "" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
+if [[ ! -z "$DMG_OUT_DIR" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
     echo "Warning, there exists a dmg file \"${DMG_NAME}\" in \"${DMG_OUT_DIR}\"."
     while true; do
         read -p "Do you wish to delete it (y|n)? " yn
@@ -412,7 +405,7 @@ fi
 #############################################################################
 
 # only create a new dmg file of existing app bundle
-if [[ ! "$DMG_OUT_DIR" == "" && "$REPACKAGE" -eq 1 ]]; then
+if [[ ! -z "$DMG_OUT_DIR" && "$REPACKAGE" -eq 1 ]]; then
     create_dmg
     exit_nice 0
 fi
@@ -431,7 +424,7 @@ if [[ -d $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp/Contents ]]; 
 fi
 
 # configure and compile GRASS GIS
-pushd "$GRASSDIR"
+pushd "$GRASSDIR" > /dev/null
 
 echo "Starting \"make distclean\"..."
 make distclean &>/dev/null
@@ -448,7 +441,7 @@ echo "Start installation..."
 make install
 echo "Finished installation."
 
-popd
+popd > /dev/null
 
 # replace SDK with a unversioned one of Command Line Tools
 FILE=$GRASS_APP_BUNDLE/Contents/Resources/include/Make/Platform.make
@@ -468,7 +461,7 @@ rm -rf $GRASS_APP_BUNDLE/Contents/Resources/shell
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/var
 
 # create dmg file
-if [[ ! "$DMG_OUT_DIR" == "" ]]; then
+if [[ ! -z "$DMG_OUT_DIR" ]]; then
     create_dmg
 fi
 
