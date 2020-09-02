@@ -4,7 +4,7 @@ setuptools
 python=3.8.3
 conda-forge::python.app
 numpy
-gdal >3
+gdal>3
 freetype
 cairo
 matplotlib
@@ -20,15 +20,15 @@ libiconv
 fftw
 blas
 giflib
-proj=6.2.1
-geos
+proj<7
+geos>=3.8.0
 krb5
 gettext
 lastools
 ghostscript
 zstd
-pdal
+pdal>=2.1
 ply
 svn
 postgresql
-postgis
+postgis>=3
