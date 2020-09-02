@@ -3,7 +3,7 @@ clangxx_osx-64
 setuptools
 python=3.7.8
 numpy
-gdal >2
+gdal >3
 freetype
 cairo
 matplotlib
