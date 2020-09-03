@@ -222,7 +222,7 @@ function create_dmg () {
     fi
 
     local tmpdir=`mktemp -d /tmp/org.osgeo.grass.XXXXXX`
-    local dmg_tmpfile=grass-tmp-$$.dmg
+    local dmg_tmpfile=${tmpdir}/grass-tmp-$$.dmg
     local exact_app_size=`du -ks $GRASS_APP_BUNDLE | cut -f 1`
     local dmg_size=$((exact_app_size*115/100))
 
@@ -231,15 +231,15 @@ function create_dmg () {
         -fs HFS+ \
         -fsargs "-c c=64,a=16,e=16" \
         -format UDRW \
-        -size ${dmg_size}k "${tmpdir}/${dmg_tmpfile}"
+        -size ${dmg_size}k "${dmg_tmpfile}"
 
     if [ $? -ne 0 ]; then
         rm -rf $tmpdir
         exit_nice $?
     fi
 
-    DEVICE=`sudo hdiutil attach -readwrite -noverify -noautoopen "${tmpdir}/${dmg_tmpfile}" | egrep '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}'`
-    sudo hdiutil attach "${tmpdir}/${dmg_tmpfile}" || error "Can't attach temp DMG"
+    DEVICE=`sudo hdiutil attach -readwrite -noverify -noautoopen "${dmg_tmpfile}" | egrep '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}'`
+    sudo hdiutil attach "${dmg_tmpfile}" || error "Can't attach temp DMG"
 
     mkdir -p "/Volumes/${DMG_TITLE}/.background"
     cp -p "${THIS_SCRIPT_DIR}/files/dmg-background.png" \
@@ -272,7 +272,7 @@ EOF
     sleep 3
     hdiutil detach $DEVICE
 
-    hdiutil convert "${tmpdir}/${dmg_tmpfile}" \
+    hdiutil convert "${dmg_tmpfile}" \
         -format UDZO -imagekey zlib-level=9 -o "${DMG_OUT_DIR}/${DMG_NAME}"
 
     if [ $? -ne 0 ]; then
