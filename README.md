@@ -24,6 +24,9 @@ Arguments:
   -o
   --dmg-out-dir [path] Output directory path for DMG file creation
                        This is a requirement for creating .dmg files.
+  -c
+  --conda-file         Conda package requirement file, optional, full path to
+                       file.
   -r
   --repackage          Recreate dmg file from previously built app,
                        setting [-o | --dmg-out-dir] is a requirement.
@@ -73,5 +76,18 @@ Example of building and creating dmg with executing with arguments:
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
   --dmg-out-dir ~/Desktop
 ```
+
+
+## Change Default Settings
+
+By default a conda environment will be created by an explicit conda requirement
+file (`default/conda-requirements-stable.txt`). It was created by executing
+`conda list --explicit` on an environment created by the file
+`default/conda-requirements-dev.txt`. This enables reproducibility and stability.
+It is also possible to use a customized conda requirement file, set as an argument
+(or in `configure-build.sh`).
+
+GRASS configure settings are set in `default/configure-grass.sh`. Changes to that
+file should reflect settings of conda environment.
 
 

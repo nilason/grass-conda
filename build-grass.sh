@@ -34,7 +34,7 @@ GRASS_VERSION_DATE=
 PATCH_DIR=
 GRASS_APP_NAME=""
 GRASS_APP_BUNDLE=""
-CONDA_REQ_FILE="${THIS_SCRIPT_DIR}/conda-requirements.txt"
+CONDA_REQ_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-stable.txt"
 DMG_TITLE=
 DMG_NAME=
 DMG_OUT_DIR=
@@ -43,7 +43,7 @@ REPACKAGE=0
 MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
 
 # read in configurations
-. "${THIS_SCRIPT_DIR}/configure-build.sh"
+source "${THIS_SCRIPT_DIR}/configure-build.sh"
 
 #############################################################################
 # Functions
@@ -69,6 +69,9 @@ Arguments:
   -o
   --dmg-out-dir [path] Output directory path for DMG file creation
                        This is a requirement for creating .dmg files.
+  -c
+  --conda-file         Conda package requirement file, optional, full path to
+                       file.
   -r
   --repackage          Recreate dmg file from previously built app,
                        setting [-o | --dmg-out-dir] is a requirement.
@@ -199,7 +202,7 @@ function set_up_conda () {
         exit_nice 1 cleanup
     fi
     $condabin install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
-        --file=$CONDA_REQ_FILE -c conda-forge
+        --file="${CONDA_REQ_FILE}" -c conda-forge
     [ $? -ne 0 ] && exit_nice $? cleanup
 }
 
@@ -301,6 +304,9 @@ while [ "$1" != "" ]; do
         ;;
         -o | --dmg-out-dir ) shift
         DMG_OUT_DIR=$1
+        ;;
+        -c | --conda-file ) shift
+        CONDA_REQ_FILE=$1
         ;;
         -r | --repackage )
         REPACKAGE=1
@@ -416,7 +422,7 @@ echo "Finished \"make distclean\""
 
 export BUILD_SDK=$SDK
 export DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
-. "$THIS_SCRIPT_DIR/configure-grass.sh"
+source "$THIS_SCRIPT_DIR/default/configure-grass.sh"
 
 make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
 if [ $? -ne 0 ]; then
