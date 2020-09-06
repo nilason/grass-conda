@@ -26,7 +26,8 @@ fi
 osascript  <<EOF
 tell app "Terminal"
   do script "/usr/bin/env -i HOME=$HOME LANG=$language LC_ALL=$language \
-      SHELL=$shell PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib \
-      $script_dir/MacOS/Grass.sh"
+BASH_SILENCE_DEPRECATION_WARNING=1 \
+SHELL=$shell PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib \
+$script_dir/MacOS/Grass.sh"
 end tell
 EOF
