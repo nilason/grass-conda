@@ -3,11 +3,10 @@
 This is a script package for nearly automated build of GRASS GIS as a macOS
 application bundle (GRASS-x.x.app).
 
-The building script `build-grass.sh` will do all the steps – from activating
-conda environment, creating App bundle, installing miniconda and dependencies to
-patching, compiling and installing GRASS GIS – to end up with an installed
-GRASS.app in `/Applications`. It can also create a compressed dmg file if so
-wished.
+The building script `build-grass.sh` will do all the steps – creating App
+bundle, installing miniconda and dependencies, to patching, compiling and
+installing GRASS GIS – to end up with an installed GRASS.app in `/Applications`.
+It can also create a compressed dmg file if so wished.
 
 
 Usage:
@@ -22,8 +21,6 @@ Arguments:
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
                        e.g. "10.14", optional, default is set from SDK
-  -c
-  --conda-env          Conda environment name
   -o
   --dmg-out-dir [path] Output directory path for DMG file creation
                        This is a requirement for creating .dmg files.
@@ -35,21 +32,13 @@ Arguments:
 
 ```
 
-## Prerequisites
-
-Installation of Anaconda for macOS https://www.anaconda.com/.
-
-Create conda environment, e.g.:
-```
-conda create -n anaconda_p37 python==3.7.8 anaconda
-```
 
 ## Instructions
 
 Fork or download this grass-conda repository to local disk. Make sure you have
 the GRASS GIS source directory on local disk.
 
-There are currently four variables needed to be set either through editing the
+There are currently two variables needed to be set either through editing the
 `configure-build.sh` file, or by giving them as arguments to the main script:
 `./build-grass.sh`.
 
@@ -62,7 +51,6 @@ Required settings:
   contain spaces)
 - GRASSDIR full path to the GRASS GIS source directory (path may **not**
   contain spaces)
-- CONDA_ENV name of conda environment
 
 Example with using settings in `configure-build.sh`:
 ```
@@ -75,8 +63,7 @@ Example with executing with arguments:
 ./build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
-  --target 10.14 \
-  --conda-env anaconda_p37
+  --target 10.14
 ```
 
 Example of building and creating dmg with executing with arguments:
@@ -84,7 +71,6 @@ Example of building and creating dmg with executing with arguments:
 ~/scripts/grass-conda/build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
-  --conda-env anaconda_p37 \
   --dmg-out-dir ~/Desktop
 ```
 

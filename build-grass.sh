@@ -34,7 +34,6 @@ GRASS_VERSION_DATE=
 PATCH_DIR=
 GRASS_APP_NAME=""
 GRASS_APP_BUNDLE=""
-CONDA_ENV=
 CONDA_REQ_FILE="${THIS_SCRIPT_DIR}/conda-requirements.txt"
 DMG_TITLE=
 DMG_NAME=
@@ -67,8 +66,6 @@ Arguments:
   -t
   --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
                        e.g. "10.14", optional, default is set from SDK
-  -c
-  --conda-env          Conda environment name, required
   -o
   --dmg-out-dir [path] Output directory path for DMG file creation
                        This is a requirement for creating .dmg files.
@@ -194,20 +191,14 @@ function set_up_conda () {
         [ $? -ne 0 ] && exit_nice $? cleanup
     fi
 
-    if [ ! -f "$(conda info --base)/etc/profile.d/conda.sh" ]; then
-        echo "Error: failed to locate the file \"/etc/profile.d/conda.sh\" in conda base \"$(conda info --base)\""
-        exit_nice 1 cleanup
-    fi
-
-    # a hack, this is needed to enable `conda activate` in bash script
-    # see https://github.com/conda/conda/issues/7980
-    . $(conda info --base)/etc/profile.d/conda.sh
-    conda activate $CONDA_ENV
-    [ $? -ne 0 ] && exit_nice $? cleanup
-
     $BASH "$miniconda" -b -f -p "$GRASS_APP_BUNDLE/Contents/Resources"
     export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
-    conda install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
+    local condabin=$GRASS_APP_BUNDLE/Contents/Resources/condabin/conda
+    if [ ! -f "$condabin" ]; then
+        echo "Error, could not find conda binary file at ${condabin}"
+        exit_nice 1 cleanup
+    fi
+    $condabin install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
         --file=$CONDA_REQ_FILE -c conda-forge
     [ $? -ne 0 ] && exit_nice $? cleanup
 }
@@ -297,9 +288,6 @@ while [ "$1" != "" ]; do
         -g | --grassdir ) shift
         GRASSDIR=$1
         ;;
-        -c | --conda-env ) shift
-        CONDA_ENV=$1
-        ;;
         -t | --target ) shift
         DEPLOYMENT_TARGET=$1
         ;;
@@ -372,18 +360,6 @@ fi
 
 if [[ "$REPACKAGE" -eq 1 && ! -d  "$GRASS_APP_BUNDLE" ]]; then
     echo "Error, attempt to repackage a non-existing \"$GRASS_APP_BUNDLE\" app bundle."
-    exit_nice 1
-fi
-
-# check if conda is available
-if ! type conda &>/dev/null ; then
-    echo "Error, conda() not found, make sure to activate conda environment"
-    exit_nice 1
-fi
-
-# check for existence of conda environment
-if [ `conda env list | grep -o "^$CONDA_ENV " | wc -l` -eq 0 ]; then
-    echo "Error, could not find conda environment \"$CONDA_ENV\""
     exit_nice 1
 fi
 
