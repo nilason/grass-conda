@@ -275,6 +275,14 @@ EOF
     echo
 }
 
+function remove_dmg () {
+    if [ -d "/Volumes/${DMG_TITLE}" ]; then
+        disk=`diskutil list | grep ${DMG_TITLE} | awk -F\  '{print $NF}'`
+        diskutil unmount $disk
+    fi
+    rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"
+}
+
 
 #############################################################################
 # Read script arguments
@@ -351,7 +359,7 @@ if [[ ! -z "$DMG_OUT_DIR" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
     while true; do
         read -p "Do you wish to delete it (y|n)? " yn
         case $yn in
-            [Yy]* ) rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"; break;;
+            [Yy]* ) remove_dmg; break;;
             [Nn]* ) exit_nice 0;;
             * ) echo "Please answer yes or no.";;
         esac
