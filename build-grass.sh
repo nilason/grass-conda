@@ -435,6 +435,12 @@ export DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 . "$THIS_SCRIPT_DIR/configure-grass.sh"
 
 make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
+if [ $? -ne 0 ]; then
+    echo "Compilation failed, you may need to reset the GRASS git repository."
+    echo "This can be made with: \"cd [grass-source-dir] && git reset --hard\"."
+    echo
+    exit_nice $?
+fi
 
 echo
 echo "Start installation..."
