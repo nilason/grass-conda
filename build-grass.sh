@@ -34,12 +34,16 @@ GRASS_VERSION_DATE=
 PATCH_DIR=
 GRASS_APP_NAME=""
 GRASS_APP_BUNDLE=""
-CONDA_REQ_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-stable.txt"
+CONDA_STABLE_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-stable.txt"
+CONDA_DEV_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-dev.txt"
+CONDA_REQ_FILE="$CONDA_STABLE_FILE"
+CONDA_BIN=
 DMG_TITLE=
 DMG_NAME=
 DMG_OUT_DIR=
 BUNDLE_VERSION=
 REPACKAGE=0
+CONDA_UPDATE_STABLE=0
 MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
 
 # read in configurations
@@ -58,25 +62,29 @@ Description...
 Usage:  $THIS_SCRIPT [arguments]
 Arguments:
   -g
-  --grassdir    [path] GRASS GIS source directory, required, spaces in path not
-                       allowed
+  --grassdir    [path]  GRASS GIS source directory, required, spaces in path not
+                        allowed
   -s
-  --sdk         [path] MacOS SDK - full path to the SDK, which will be set as
-                       -isysroot, required, spaces in path not allowed
+  --sdk         [path]  MacOS SDK - full path to the SDK, which will be set as
+                        -isysroot, required, spaces in path not allowed
   -t
-  --target             Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
-                       e.g. "10.14", optional, default is set from SDK
+  --target    [target]  Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
+                        e.g. "10.14", optional, default is set from SDK
   -o
-  --dmg-out-dir [path] Output directory path for DMG file creation
-                       This is a requirement for creating .dmg files.
+  --dmg-out-dir [path]  Output directory path for DMG file creation
+                        This is a requirement for creating .dmg files.
   -c
-  --conda-file         Conda package requirement file, optional, full path to
-                       file.
+  --conda-file  [path]  Conda package requirement file, optional, full path to
+                        file.
+  -u
+  --update-conda-stable Update the stable explicit conda requirement file. This
+                        is only allowed if conda-requirements-dev.txt is used
+                        (with --conda-file), to keep the two files in sync.
   -r
-  --repackage          Recreate dmg file from previously built app,
-                       setting [-o | --dmg-out-dir] is a requirement.
+  --repackage           Recreate dmg file from previously built app,
+                        setting [-o | --dmg-out-dir] is a requirement.
   -h
-  --help               Usage information
+  --help                Usage information
 
 Example:
   ./$THIS_SCRIPT
@@ -196,12 +204,12 @@ function set_up_conda () {
 
     $BASH "$miniconda" -b -f -p "$GRASS_APP_BUNDLE/Contents/Resources"
     export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
-    local condabin=$GRASS_APP_BUNDLE/Contents/Resources/condabin/conda
-    if [ ! -f "$condabin" ]; then
-        echo "Error, could not find conda binary file at ${condabin}"
+    CONDA_BIN=$GRASS_APP_BUNDLE/Contents/Resources/condabin/conda
+    if [ ! -f "$CONDA_BIN" ]; then
+        echo "Error, could not find conda binary file at ${CONDA_BIN}"
         exit_nice 1 cleanup
     fi
-    $condabin install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
+    $CONDA_BIN install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
         --file="${CONDA_REQ_FILE}" -c conda-forge
     [ $? -ne 0 ] && exit_nice $? cleanup
 }
@@ -310,6 +318,9 @@ while [ "$1" != "" ]; do
         ;;
         -r | --repackage )
         REPACKAGE=1
+        ;;
+        -u | --update-conda-stable )
+        CONDA_UPDATE_STABLE=1
         ;;
         -h | --help )
         display_usage
@@ -444,6 +455,13 @@ FILE=$GRASS_APP_BUNDLE/Contents/Resources/include/Make/Platform.make
 sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" $FILE
 if [ $? -eq 0 ]; then
     rm -f $FILE.bak
+fi
+
+# update the stable conda explicit requirement file, this is only allowed if
+# default/conda-requirements-dev.txt is used, to keep the two files in sync
+if [[ "$CONDA_UPDATE_STABLE" -eq 1 && \
+    "$CONDA_REQ_FILE" = "$CONDA_DEV_FILE" ]]; then
+    $CONDA_BIN list --explicit > "$CONDA_STABLE_FILE"
 fi
 
 # save some disk space
