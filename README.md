@@ -58,7 +58,7 @@ while finding Xcode's default SDK can be achieved with e.g.
 `xcrun --show-sdk-path`. (See `man xcrun` for more functions.)
 
 Note: Compiling GRASS (c/c++ based) addon extensions with the resulting GRASS.app
-requires CLI installation too.
+requires CLT installation too.
 
 ## Instructions
 
