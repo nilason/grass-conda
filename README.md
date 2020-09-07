@@ -42,7 +42,7 @@ Arguments:
 
 ## Requirements
 
-- Apple's Command Line Tools (CLT)
+- Apple's Command Line Tools
 - GRASS GIS source code repository (preferable a git repo)
 - This (grass-conda) script package
 
@@ -57,8 +57,8 @@ CLT will typically install SDKs in `/Library/Developer/CommandLineTools/SDKs/`,
 while finding Xcode's default SDK can be achieved with e.g.
 `xcrun --show-sdk-path`. (See `man xcrun` for more functions.)
 
-Note: Compiling GRASS (c/c++ based) addon extensions with the resulting GRASS.app
-requires CLT installation too.
+**Note**: Compiling GRASS (c/c++ based) addon extensions with the resulting
+GRASS.app requires CLT installation too.
 
 ## Instructions
 
@@ -111,7 +111,7 @@ file (`default/conda-requirements-stable.txt`). It was created by executing
 It is also possible to use a customized conda requirement file, set as an argument
 (or in `configure-build.sh`).
 
-To be able to bumb dependency versions and/or add/remove dependencies for the
+To be able to bump dependency versions and/or add/remove dependencies for the
 `default/conda-requirements-stable.txt` file the command flag
 `--update-conda-stable` can be added. A requirement for this is that
 `default/conda-requirements-dev.txt` is used for `--conda-file`. This function is
