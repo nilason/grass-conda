@@ -25,8 +25,7 @@ Arguments:
   --dmg-out-dir [path]  Output directory path for DMG file creation
                         This is a requirement for creating .dmg files.
   -c
-  --conda-file  [path]  Conda package requirement file, optional, full path to
-                        file.
+  --conda-file  [path]  Conda package requirement file, optional.
   -u
   --update-conda-stable Update the stable explicit conda requirement file. This
                         is only allowed if conda-requirements-dev.txt is used
@@ -98,6 +97,7 @@ Example of building and creating dmg with executing with arguments:
 ~/scripts/grass-conda/build-grass.sh \
   --grassdir /Volumes/dev/grass \
   --sdk /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \
+  --conda-file ./Desktop/requirement.txt \
   --dmg-out-dir ~/Desktop
 ```
 

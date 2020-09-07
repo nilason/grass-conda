@@ -74,8 +74,7 @@ Arguments:
   --dmg-out-dir [path]  Output directory path for DMG file creation
                         This is a requirement for creating .dmg files.
   -c
-  --conda-file  [path]  Conda package requirement file, optional, full path to
-                        file.
+  --conda-file  [path]  Conda package requirement file, optional.
   -u
   --update-conda-stable Update the stable explicit conda requirement file. This
                         is only allowed if conda-requirements-dev.txt is used
@@ -339,6 +338,9 @@ done
 #############################################################################
 # Check arguments and files
 #############################################################################
+
+# make full path of CONDA_REQ_FILE
+CONDA_REQ_FILE=$(cd $(dirname "$CONDA_REQ_FILE") && pwd)/$(basename "$CONDA_REQ_FILE")
 
 if [ ! -f  "${SDK}/SDKSettings.plist" ]; then
     echo "Error, could not find valid MacOS SDK at $SDK"
