@@ -42,7 +42,7 @@ Arguments:
 ## Requirements
 
 - Apple's Command Line Tools
-- GRASS GIS source code repository (preferable a git repo)
+- GRASS GIS source code repository (preferably a git repo)
 - This (grass-conda) script package
 
 You need to install Apple's Command Line Tools (CLT), with or without Xcode.
@@ -66,7 +66,7 @@ have the GRASS GIS source directory on local disk too.
 
 If GRASS source directory is a git repo, you can checkout the branch/release
 you want to build. At present the `master` and `releasebranch_7_8` branches, and
-the `7.8.3` release is supported.
+the `7.8.3` release is supported, e.g.:
 
 ```
 cd [grass-source-dir]
