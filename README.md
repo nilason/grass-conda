@@ -64,6 +64,23 @@ GRASS.app requires CLT installation too.
 Fork or download this grass-conda repository to local disk and make sure you
 have the GRASS GIS source directory on local disk too.
 
+If GRASS source directory is a git repo, you can checkout the branch/release
+you want to build. At present the `master` and `releasebranch_7_8` branches, and
+the `7.8.3` release is supported.
+
+```
+cd [grass-source-dir]
+
+# for 7.9.dev
+git checkout master
+
+# for 7.8.4dev
+git checkout releasebranch_7_8
+
+# for 7.8.3 release
+git checkout 7.8.3
+```
+
 There are currently two required variables needed to be set either through
 editing the `configure-build.sh` file, or by giving them as arguments to the
 main script: `./build-grass.sh`.
