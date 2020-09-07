@@ -29,8 +29,8 @@ Arguments:
                         file.
   -u
   --update-conda-stable Update the stable explicit conda requirement file. This
-						is only allowed if conda-requirements-dev.txt is used
-					    (with --conda-file), to keep the two files in sync.
+                        is only allowed if conda-requirements-dev.txt is used
+                        (with --conda-file), to keep the two files in sync.
   -r
   --repackage           Recreate dmg file from previously built app,
                         setting [-o | --dmg-out-dir] is a requirement.
