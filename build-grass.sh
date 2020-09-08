@@ -442,12 +442,20 @@ if [ $? -ne 0 ]; then
     echo "Compilation failed, you may need to reset the GRASS git repository."
     echo "This can be made with: \"cd [grass-source-dir] && git reset --hard\"."
     echo
+    popd > /dev/null
     exit_nice $?
 fi
 
 echo
 echo "Start installation..."
 make install
+if [ $? -ne 0 ]; then
+    echo "Installation failed, you may need to reset the GRASS git repository."
+    echo "This can be made with: \"cd [grass-source-dir] && git reset --hard\"."
+    echo
+    popd > /dev/null
+    exit_nice $?
+fi
 echo "Finished installation."
 
 popd > /dev/null
