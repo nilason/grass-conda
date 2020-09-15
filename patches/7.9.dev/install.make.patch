@@ -1,14 +1,5 @@
---- include/Make/Install.make.orig	2020-08-31 13:53:10.000000000 +0200
-+++ include/Make/Install.make	2020-08-31 14:00:25.000000000 +0200
-@@ -71,7 +71,7 @@
- 	fi
- 
- install-check-prefix:
--	@ result=`echo "$(INST_DIR)" | awk '{ if ($$1 ~ /grass/) print $$1 }'`; \
-+	@ result=`echo "$(INST_DIR)" | awk '{ if (tolower($$1) ~ /grass/) print $$1 }'`; \
- 	if [ "$$result" = "" ] ; then \
- 		echo "WARNING: Your install directory $(INST_DIR)" >&2 ; \
- 		echo "  does not contain the word 'grass'." >&2 ; \
+--- include/Make/Install.make.orig	2020-09-15 08:37:06.000000000 +0200
++++ include/Make/Install.make	2020-09-15 08:40:50.000000000 +0200
 @@ -115,11 +115,6 @@
  
  	-$(CHMOD) -R a+rX $(INST_DIR) 2>/dev/null
