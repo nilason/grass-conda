@@ -48,7 +48,7 @@ Arguments:
 You need to install Apple's Command Line Tools (CLT), with or without Xcode.
 Installing CLT is possible with following terminal command:
 ```
-xcode-select —install
+xcode-select --install
 ```
 Xcode is available for download at Apple's App Store.
 
