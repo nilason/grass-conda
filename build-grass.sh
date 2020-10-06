@@ -147,9 +147,6 @@ function make_app_bundle_dir () {
     mkdir -m 0755 "$macos_dir"
 
     local info_plist_in="$GRASSDIR/macosx/app/Info.plist.in"
-    if [ "$GRASS_VERSION" = "7.8.3" ]; then
-        info_plist_in="$THIS_SCRIPT_DIR/files/Info.plist.in"
-    fi
 
     sed "s|@GRASS_VERSION_DATE@|$GRASS_VERSION_DATE|g" "$info_plist_in" | \
         sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
@@ -166,16 +163,9 @@ function make_app_bundle_dir () {
     cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
         "$macos_dir/build_html_user_index.sh"
     cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/GRASS"
-    if [ "$GRASS_VERSION" = "7.8.3" ]; then
-        cp -p "$THIS_SCRIPT_DIR/files/AppIcon.icns" \
-             "$resources_dir/AppIcon.icns"
-        cp -p "$THIS_SCRIPT_DIR/files/GRASSDocument_gxw.icns" \
-            "$resources_dir/GRASSDocument_gxw.icns"
-    else
-        cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
-        cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
-            "$resources_dir/GRASSDocument_gxw.icns"
-    fi
+    cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
+    cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
+        "$resources_dir/GRASSDocument_gxw.icns"
 
     chmod 0644 "$contents_dir/Info.plist"
     chmod 0755 "$macos_dir/build_gui_user_menu.sh"
