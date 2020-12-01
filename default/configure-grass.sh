@@ -8,6 +8,9 @@ export CXX=$PREFIX/bin/clang++
 export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
+if [ "$GRASS_VERSION" = "7.9.dev" ]; then
+  export LDFLAGS="-Wl,-rpath,$PREFIX/lib"
+fi
 
 CONFIGURE_FLAGS="\
   --with-macosx-sdk=$CONDA_BUILD_SYSROOT \

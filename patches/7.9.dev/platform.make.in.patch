@@ -1,5 +1,5 @@
---- include/Make/Platform.make.in.orig	2020-08-11 11:06:04.000000000 +0200
-+++ include/Make/Platform.make.in	2020-08-11 11:27:48.000000000 +0200
+--- include/Make/Platform.make.in.orig	2020-09-18 20:22:59.000000000 +0200
++++ include/Make/Platform.make.in	2020-09-19 09:21:53.000000000 +0200
 @@ -37,7 +37,7 @@
  exec_prefix         = @exec_prefix@
  ARCH                = @host@
@@ -14,19 +14,10 @@
  #shared libs
  SHLIB_PREFIX        = lib
 -SHLIB_LD            = @SHLIB_LD@
-+SHLIB_LD            = @SHLIB_LD@ ${ICONVLIB} ${LINK_FLAGS}
++SHLIB_LD            = @SHLIB_LD@ ${ICONVLIB}
  SHLIB_LDFLAGS       = @SHLIB_LD_FLAGS@
  SHLIB_CFLAGS        = @SHLIB_CFLAGS@
  SHLIB_SUFFIX        = @SHLIB_SUFFIX@
-@@ -75,7 +75,7 @@
- CFLAGS              = @CFLAGS@
- CXXFLAGS            = @CXXFLAGS@
- INCLUDE_DIRS        = @INCLUDE_DIRS@
--LINK_FLAGS          = @LDFLAGS@
-+LINK_FLAGS          = @LDFLAGS@ -Xlinker -rpath -Xlinker ${prefix}/lib -Xlinker -rpath -Xlinker ${RUN_GISBASE}/lib
- 
- DLLIB               = @DLLIB@
- XCFLAGS             = @X_CFLAGS@
 @@ -212,7 +212,7 @@
  CAIRO_HAS_XRENDER_SURFACE = @CAIRO_HAS_XRENDER_SURFACE@
  
