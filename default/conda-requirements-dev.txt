@@ -1,10 +1,10 @@
 clang_osx-64
 clangxx_osx-64
 setuptools
-python=3.8.3
+python=3.8.6
 conda-forge::python.app
 numpy
-gdal>3
+gdal>=3.1.4
 freetype
 cairo
 matplotlib
@@ -20,8 +20,8 @@ libiconv
 fftw
 blas
 giflib
-proj<7
-geos>=3.8.0
+proj>=7.1.1
+geos>=3.8.1
 krb5
 gettext
 lastools
@@ -31,4 +31,4 @@ pdal>=2.1
 ply
 svn
 postgresql
-postgis>=3
+postgis>=3.0.1
