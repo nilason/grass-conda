@@ -66,7 +66,7 @@ have the GRASS GIS source directory on local disk too.
 
 If GRASS source directory is a git repo, you can checkout the branch/release
 you want to build. At present the `master` and `releasebranch_7_8` branches, and
-the `7.8.4` release is supported, e.g.:
+the `7.8.5` release is supported, e.g.:
 
 ```
 cd [grass-source-dir]
@@ -74,11 +74,11 @@ cd [grass-source-dir]
 # for 7.9.dev
 git checkout master
 
-# for 7.8.5dev
+# for 7.8.6dev
 git checkout releasebranch_7_8
 
-# for 7.8.4 release
-git checkout 7.8.4
+# for 7.8.5 release
+git checkout 7.8.5
 ```
 
 There are currently two required variables needed to be set either through
