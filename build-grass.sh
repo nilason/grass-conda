@@ -222,7 +222,7 @@ function create_dmg () {
     local tmpdir=`mktemp -d /tmp/org.osgeo.grass.XXXXXX`
     local dmg_tmpfile=${tmpdir}/grass-tmp-$$.dmg
     local exact_app_size=`du -ks $GRASS_APP_BUNDLE | cut -f 1`
-    local dmg_size=$((exact_app_size*115/100))
+    local dmg_size=$((exact_app_size*120/100))
 
     sudo hdiutil create -srcfolder $GRASS_APP_BUNDLE \
         -volname $DMG_TITLE \
