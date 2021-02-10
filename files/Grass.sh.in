@@ -75,4 +75,4 @@ export GRASS_PYTHON="$GISBASE/bin/pythonw"
 export GRASS_PYTHONWX="$GISBASE/bin/pythonw"
 
 # use the python wrapper to start grass
-"$GRASS_PYTHON" "$GISBASE/bin/@GRASSBIN@" "-gui" "$@"
+"$GRASS_PYTHON" "$GISBASE/bin/@GRASSBIN@" "--gui" "$@"
