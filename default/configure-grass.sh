@@ -10,6 +10,8 @@ export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
 if [ "$GRASS_VERSION" = "7.9.dev" ]; then
   export LDFLAGS="-Wl,-rpath,$PREFIX/lib"
+  export CFLAGS="-O2 -pipe -arch x86_64 -DGL_SILENCE_DEPRECATION"
+  export CXXFLAGS="-O2 -pipe -stdlib=libc++ -arch x86_64"
 fi
 
 CONFIGURE_FLAGS="\
