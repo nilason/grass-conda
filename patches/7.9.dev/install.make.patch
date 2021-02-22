@@ -1,14 +1,14 @@
---- include/Make/Install.make.orig	2020-09-15 08:37:06.000000000 +0200
-+++ include/Make/Install.make	2020-09-15 08:40:50.000000000 +0200
+--- include/Make/Install.make.orig	2021-02-21 14:38:57.000000000 +0100
++++ include/Make/Install.make	2021-02-22 09:58:14.000000000 +0100
 @@ -115,11 +115,6 @@
  
- 	-$(CHMOD) -R a+rX $(INST_DIR) 2>/dev/null
+ 	-$(CHMOD) -R a+rX $(DESTDIR)$(INST_DIR) 2>/dev/null
  
 -ifneq ($(findstring darwin,$(ARCH)),)
 -	@# enable OSX Help Viewer
 -	@/bin/ln -sfh "$(INST_DIR)/docs/html" /Library/Documentation/Help/GRASS-$(GRASS_VERSION_MAJOR).$(GRASS_VERSION_MINOR)
 -endif
 -
- $(INST_DIR) $(UNIX_BIN):
- 	$(MAKE_DIR_CMD) $@
+ $(DESTDIR):
+ 	$(MAKE_DIR_CMD) -p $@
  
