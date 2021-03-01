@@ -60,6 +60,9 @@ CONFIGURE_FLAGS="\
   --with-blas \
   --with-blas-libs=$PREFIX/lib \
   --with-blas-includes=$PREFIX/include \
+  --with-lapack
+  --with-lapack-includes=$PREFIX/include \
+  --with-lapack-libs=$PREFIX/lib \
   --with-netcdf=$PREFIX/bin/nc-config \
   --with-nls \
   --with-libs=$PREFIX/lib \
