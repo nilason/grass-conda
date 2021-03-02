@@ -210,6 +210,13 @@ function set_up_conda () {
     [ $? -ne 0 ] && exit_nice $? cleanup
 }
 
+function use_python_framework_build () {
+    pushd "$GRASS_APP_BUNDLE/Contents/Resources/bin" > /dev/null
+    ln -sf pythonw python3
+    ln -sf pythonw python
+    popd > /dev/null
+}
+
 function create_dmg () {
     echo
     echo "Create dmg file of $GRASS_APP_BUNDLE ..."
@@ -487,6 +494,9 @@ rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgconfig
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgs
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/shell
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/var
+
+# relink python to framework build
+use_python_framework_build
 
 # create dmg file
 if [[ ! -z "$DMG_OUT_DIR" ]]; then
