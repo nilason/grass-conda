@@ -471,6 +471,13 @@ if [[ "$CONDA_UPDATE_STABLE" -eq 1 && \
     $CONDA_BIN list --explicit > "$CONDA_STABLE_FILE"
 fi
 
+# print list of installed packages
+echo "================================================================="
+echo
+$CONDA_BIN list
+echo
+echo "================================================================="
+
 # save some disk space
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/build-1
 rm -rf $GRASS_APP_BUNDLE/Contents/Resources/conda-meta
