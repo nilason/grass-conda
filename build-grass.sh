@@ -5,7 +5,7 @@
 # TOOL:         build-grass.sh
 # AUTHOR(s):    Nicklas Larsson
 # PURPOSE:
-# COPYRIGHT:    (c) 2020 Nicklas Larsson
+# COPYRIGHT:    (c) 2020-2021 Nicklas Larsson
 #               (c) 2020 Michael Barton
 #               (c) 2018 Eric Hutton, Community Surface Dynamics Modeling
 #                   System
@@ -19,10 +19,10 @@
 #
 #
 
-
 BASH=/bin/bash
 THIS_SCRIPT=`basename $0`
-THIS_SCRIPT_DIR=$(cd $(dirname "$0"); pwd)
+export THIS_SCRIPT_DIR=$(cd $(dirname "$0"); pwd)
+export EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
 SDK=
 GRASSDIR=
 DEPLOYMENT_TARGET=
@@ -44,6 +44,7 @@ DMG_OUT_DIR=
 BUNDLE_VERSION=
 REPACKAGE=0
 CONDA_UPDATE_STABLE=0
+WITH_LIBLAS=0
 MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
 
 # read in configurations
@@ -75,6 +76,7 @@ Arguments:
                         This is a requirement for creating .dmg files.
   -c
   --conda-file  [path]  Conda package requirement file, optional.
+  --with-liblas         Include libLAS support, optional, default is no support.
   -u
   --update-conda-stable Update the stable explicit conda requirement file. This
                         is only allowed if conda-requirements-dev.txt is used
@@ -191,8 +193,13 @@ function reset_grass_patches () {
 }
 
 function set_up_conda () {
+    # move existing miniconda script to new external directory
+    if [ -f "${THIS_SCRIPT_DIR}/miniconda3.sh" ]; then
+        mv "${THIS_SCRIPT_DIR}/miniconda3.sh" "${EXTERNAL_DIR}/miniconda3.sh"
+    fi
+
     # download miniconda if not already existing
-    local miniconda="$THIS_SCRIPT_DIR/miniconda3.sh"
+    local miniconda="${EXTERNAL_DIR}/miniconda3.sh"
     if [ ! -f "$miniconda" ]; then
         curl "$MINICONDA_URL" --output "$miniconda"
         [ $? -ne 0 ] && exit_nice $? cleanup
@@ -319,6 +326,9 @@ while [ "$1" != "" ]; do
         -c | --conda-file ) shift
         CONDA_REQ_FILE=$1
         ;;
+        --with-liblas )
+        WITH_LIBLAS=1
+        ;;
         -r | --repackage )
         REPACKAGE=1
         ;;
@@ -421,6 +431,8 @@ make_app_bundle_dir
 
 patch_grass
 
+mkdir -p $EXTERNAL_DIR
+
 set_up_conda
 
 # fix for miniconda python.app installer bug
@@ -430,6 +442,14 @@ if [[ -d $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp/Contents ]]; 
     rm -rf $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp
 fi
 
+export BUILD_SDK=$SDK
+export DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
+export WITH_LIBLAS=$WITH_LIBLAS
+
+if [[ "$WITH_LIBLAS" -eq 1 ]]; then
+    source "$THIS_SCRIPT_DIR/default/liblas-install.sh"
+fi
+
 # configure and compile GRASS GIS
 pushd "$GRASSDIR" > /dev/null
 
@@ -437,8 +457,6 @@ echo "Starting \"make distclean\"..."
 make distclean &>/dev/null
 echo "Finished \"make distclean\""
 
-export BUILD_SDK=$SDK
-export DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 source "$THIS_SCRIPT_DIR/default/configure-grass.sh"
 
 make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
@@ -482,6 +500,10 @@ fi
 echo "================================================================="
 echo
 $CONDA_BIN list
+if [[ "$WITH_LIBLAS" -eq 1 ]]; then
+    liblas_version=`$GRASS_APP_BUNDLE/Contents/Resources/bin/liblas-config --version`
+    echo "libLAS                    ${liblas_version}"
+fi
 echo
 echo "================================================================="
 

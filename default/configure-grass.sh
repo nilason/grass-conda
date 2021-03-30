@@ -1,5 +1,19 @@
 #!/bin/bash
 
+############################################################################
+#
+# TOOL:         configure-grass.sh
+# AUTHOR(s):    Nicklas Larsson
+# PURPOSE:      Sets up configure and compiler flags and configures GRASS GIS
+# COPYRIGHT:    (c) 2020-2021 Nicklas Larsson
+#               This package is free software under the GNU General Public
+#               License (>=v2).
+#
+#############################################################################
+#
+#
+#
+
 export PREFIX=$(python3 -c 'import sys; print(sys.prefix)')
 export PATH=$PREFIX/bin:/usr/bin:/bin:/usr/sbin:/etc:/usr/lib
 export GRASS_PYTHON=$(which pythonw)
@@ -73,5 +87,12 @@ CONFIGURE_FLAGS="\
   --with-readline-includes=$PREFIX/include/readline \
   --with-readline-libs=$PREFIX/lib
 "
+
+if [[ "$WITH_LIBLAS" -eq 1 ]]; then
+    CONFIGURE_FLAGS="\
+        ${CONFIGURE_FLAGS} \
+        --with-liblas=$PREFIX/bin/liblas-config
+    "
+fi
 
 ./configure $CONFIGURE_FLAGS
