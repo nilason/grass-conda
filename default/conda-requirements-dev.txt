@@ -33,3 +33,4 @@ ply
 svn
 postgresql
 postgis>=3.0.1
+cmake
