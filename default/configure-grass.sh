@@ -33,6 +33,7 @@ CONFIGURE_FLAGS="\
   --enable-64bit \
   --with-macosx-archs="x86_64" \
   --with-opengl=aqua \
+  --with-openmp \
   --prefix=$PREFIX \
   --with-freetype \
   --with-freetype-includes=$PREFIX/include/freetype2 \
