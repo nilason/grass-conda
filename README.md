@@ -72,7 +72,7 @@ the `7.8.5` release is supported, e.g.:
 ```
 cd [grass-source-dir]
 
-# for 7.9.dev
+# for 8.0.dev
 git checkout master
 
 # for 7.8.6dev

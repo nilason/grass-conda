@@ -158,7 +158,11 @@ function make_app_bundle_dir () {
         sed "s|@DEPLOYMENT_TARGET@|$DEPLOYMENT_TARGET|g" \
             > "$contents_dir/Info.plist"
 
-    sed "s|@GRASSBIN@|grass$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR|g" \
+    local grassbin="grass$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR"
+    if [ "$GRASS_VERSION_MAJOR" -ge 8 ]; then
+            grassbin="grass"
+    fi
+    sed "s|@GRASSBIN@|$grassbin|g" \
         "$THIS_SCRIPT_DIR/files/Grass.sh.in" > "$macos_dir/Grass.sh"
     cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
         "$macos_dir/build_gui_user_menu.sh"

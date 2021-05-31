@@ -22,7 +22,7 @@ export CXX=$PREFIX/bin/clang++
 export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
-if [ "$GRASS_VERSION" = "7.9.dev" ]; then
+if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 79 ]; then
   export LDFLAGS="-Wl,-rpath,$PREFIX/lib"
   export CFLAGS="-O2 -pipe -arch x86_64 -DGL_SILENCE_DEPRECATION"
   export CXXFLAGS="-O2 -pipe -stdlib=libc++ -arch x86_64"
