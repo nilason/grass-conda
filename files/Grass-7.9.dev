@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Opens a new Terminal window
+
+script_dir=$(dirname "$(dirname "$0")")
+
+shell=$SHELL
+
+# Set and check language code against 'locale'. Failed check will fallback
+# using English (US) as default.
+language=$(defaults read -g AppleLanguages | \
+    awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/')
+language=$(echo ${language} | cut -d \  -f 1).UTF-8
+
+LOCALE=`which locale`
+if [ "$LOCALE" = "" ]; then
+    language="en_US.UTF-8"
+else
+    locale_exists=$("$LOCALE" -a | grep -c "$language")
+    if [ "$locale_exists" -eq 0 ]; then
+        language="en_US.UTF-8"
+    fi
+fi
+
+python_app="$script_dir/Resources/bin/python.app"
+wx_setting_file="$HOME/.grass7/wx.json"
+startWithoutShell=$(
+$python_app - <<EOF
+import sys, json
+with open("${wx_setting_file}", "r") as read_file:
+    data = json.load(read_file)
+    try:
+        print(data["general"]["init"]["startWithoutShellIfPossible"]["enabled"])
+    except KeyError:
+        # TODO: implement insert default value to wx_setting_file
+        print("False")
+EOF
+)
+
+bash_silence_warn=""
+if  [[ "$shell" == *bash ]]; then
+    bash_silence_warn="BASH_SILENCE_DEPRECATION_WARNING=1"
+fi
+
+
+if [ "$startWithoutShell" == "True" ]; then
+    osascript  <<EOF
+  do shell script "cd ~; \
+GRASS_PYTHON=$python_app LANG=$language LC_ALL=$language \
+PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib HOME=~ \
+$python_app $script_dir/Resources/bin/grass79 > /dev/null 2>&1 &"
+EOF
+else
+    osascript  <<EOF
+tell app "Terminal"
+  do script "GRASS_PYTHON=$python_app HOME=$HOME LANG=$language LC_ALL=$language \
+SHELL=$shell PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib $bash_silence_warn \
+$shell $script_dir/MacOS/Grass.sh"
+end tell
+EOF
+fi
