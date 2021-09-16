@@ -30,7 +30,6 @@ fi
 
 CONFIGURE_FLAGS="\
   --with-macosx-sdk=$CONDA_BUILD_SYSROOT \
-  --enable-64bit \
   --with-macosx-archs="x86_64" \
   --with-opengl=aqua \
   --with-openmp \
@@ -39,14 +38,10 @@ CONFIGURE_FLAGS="\
   --with-freetype-includes=$PREFIX/include/freetype2 \
   --with-freetype-libs=$PREFIX/lib \
   --with-gdal=$PREFIX/bin/gdal-config \
-  --with-gdal-libs=$PREFIX/lib \
-  --with-proj=$PREFIX/bin/proj \
   --with-proj-includes=$PREFIX/include \
   --with-proj-libs=$PREFIX/lib \
   --with-proj-share=$PREFIX/share/proj \
   --with-geos=$PREFIX/bin/geos-config \
-  --with-jpeg-includes=$PREFIX/include \
-  --with-jpeg-libs=/$PREFIX/lib \
   --with-png-includes=$PREFIX/include \
   --with-png-libs=$PREFIX/lib \
   --with-tiff-includes=$PREFIX/include \
@@ -83,7 +78,6 @@ CONFIGURE_FLAGS="\
   --with-libs=$PREFIX/lib \
   --with-includes=$PREFIX/include \
   --with-pdal=$PREFIX/bin/pdal-config \
-  --with-pdal-libs=$PREFIX/lib \
   --with-readline \
   --with-readline-includes=$PREFIX/include/readline \
   --with-readline-libs=$PREFIX/lib
