@@ -221,6 +221,12 @@ function set_up_conda () {
     [ $? -ne 0 ] && exit_nice $? cleanup
 }
 
+function install_grass_session () {
+    local python_bin="$GRASS_APP_BUNDLE/Contents/Resources/bin/python"
+    $python_bin -m pip install --upgrade pip
+    $python_bin -m pip install grass-session
+}
+
 function use_python_framework_build () {
     pushd "$GRASS_APP_BUNDLE/Contents/Resources/bin" > /dev/null
     ln -sf pythonw python3
@@ -445,6 +451,8 @@ if [[ -d $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp/Contents ]]; 
         $GRASS_APP_BUNDLE/Contents/Resources/python.app/Contents
     rm -rf $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp
 fi
+
+install_grass_session
 
 export BUILD_SDK=$SDK
 export DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
