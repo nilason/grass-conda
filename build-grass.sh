@@ -144,6 +144,7 @@ function make_app_bundle_dir () {
     local contents_dir="$GRASS_APP_BUNDLE/Contents"
     local resources_dir="$GRASS_APP_BUNDLE/Contents/Resources"
     local macos_dir="$GRASS_APP_BUNDLE/Contents/MacOS"
+    local grass_bin_in="Grass.sh.in"
     mkdir -p -m 0755 "$contents_dir"
     mkdir -m 0755 "$resources_dir"
     mkdir -m 0755 "$macos_dir"
@@ -161,9 +162,10 @@ function make_app_bundle_dir () {
     local grassbin="grass$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR"
     if [ "$GRASS_VERSION_MAJOR" -ge 8 ]; then
             grassbin="grass"
+            grass_bin_in="Grass8.sh.in"
     fi
     sed "s|@GRASSBIN@|$grassbin|g" \
-        "$THIS_SCRIPT_DIR/files/Grass.sh.in" > "$macos_dir/Grass.sh"
+        "$THIS_SCRIPT_DIR/files/$grass_bin_in" > "$macos_dir/Grass.sh"
     cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
         "$macos_dir/build_gui_user_menu.sh"
     cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
