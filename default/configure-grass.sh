@@ -34,6 +34,7 @@ CONFIGURE_FLAGS="\
   --with-opengl=aqua \
   --with-openmp \
   --prefix=$PREFIX \
+  --without-x \
   --with-freetype \
   --with-freetype-includes=$PREFIX/include/freetype2 \
   --with-freetype-libs=$PREFIX/lib \
