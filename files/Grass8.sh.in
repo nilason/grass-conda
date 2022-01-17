@@ -25,12 +25,6 @@ app_dir="$(cd "$(dirname "$0")/../.."; pwd -P)"
 
 trap "echo 'User break!' ; exit" 2 3 9 15
 
-# dummy for now - just saying we're starting GRASS.app on OSX
-export GRASS_OS_STARTUP="Mac.app"
-
-### change this to dirname/MacOS or dirname/Resources??
-### set it this way instead of a direct path
-
 export GISBASE=$app_dir/Contents/Resources
 grass_ver=$(cut -d . -f 1-2 "$GISBASE/etc/VERSIONNUMBER")
 
@@ -70,9 +64,8 @@ export GRASS_FONT_CAP
 # location of epsg database and other files needed by GDAL
 export GDAL_DATA="$GISBASE/share/gdal"
 
-### replaced all the prior code for finding Python and wxPython
-export GRASS_PYTHON="$GISBASE/bin/pythonw"
-export GRASS_PYTHONWX="$GISBASE/bin/pythonw"
+# set Python
+export GRASS_PYTHON="$GISBASE/bin/python3"
 
-# use the python wrapper to start grass
+# start GRASS
 "$GRASS_PYTHON" "$GISBASE/bin/@GRASSBIN@" "--gui" "$@"

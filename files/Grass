@@ -4,30 +4,8 @@
 
 script_dir=$(dirname "$(dirname "$0")")
 
-# At present, this method starting with 'env -i' doesn't work with zsh.
-shell=$(which bash)
-
-# Set and check language code against 'locale'. Failed check will fallback
-# using English (US) as default.
-language=$(defaults read -g AppleLanguages | \
-    awk -F'"' '{print $2}' | sed '/^$/d;s/-/_/')
-language=$(echo ${language} | cut -d \  -f 1).UTF-8
-
-LOCALE=`which locale`
-if [ "$LOCALE" = "" ]; then
-    language="en_US.UTF-8"
-else
-    locale_exists=$("$LOCALE" -a | grep -c "$language")
-    if [ "$locale_exists" -eq 0 ]; then
-        language="en_US.UTF-8"
-    fi
-fi
-
 osascript  <<EOF
 tell app "Terminal"
-  do script "/usr/bin/env -i HOME=$HOME LANG=$language LC_ALL=$language \
-BASH_SILENCE_DEPRECATION_WARNING=1 \
-SHELL=$shell PATH=/usr/bin:/bin:/usr/sbin:/etc:/usr/lib \
-$script_dir/MacOS/Grass.sh"
+  do script "$script_dir/MacOS/Grass.sh"
 end tell
 EOF
