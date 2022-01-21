@@ -1,0 +1,11 @@
+--- include/Make/Install.make.orig	2021-10-01 18:46:13.000000000 +0200
++++ include/Make/Install.make	2021-10-01 18:55:18.000000000 +0200
+@@ -71,7 +71,7 @@
+ 	fi
+ 
+ install-check-prefix:
+-	@ result=`echo "$(DESTDIR)$(INST_DIR)" | awk '{ if ($$1 ~ /grass/) print $$1 }'`; \
++	@ result=`echo "$(DESTDIR)$(INST_DIR)" | awk '{ if (tolower($$1) ~ /grass/) print $$1 }'`; \
+ 	if [ "$$result" = "" ] ; then \
+ 		echo "WARNING: Your install directory $(INST_DIR)" >&2 ; \
+ 		echo "  does not contain the word 'grass'." >&2 ; \
