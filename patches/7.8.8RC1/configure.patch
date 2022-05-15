@@ -1,0 +1,13 @@
+--- configure.orig	2021-10-01 18:46:13.000000000 +0200
++++ configure	2021-10-01 18:51:06.000000000 +0200
+@@ -4037,8 +4037,8 @@
+ 	*-apple-darwin*)
+ 	    SHLIB_CFLAGS="-fno-common"
+ 	    SHLIB_SUFFIX=".dylib"
+-	    SHLIB_LD="${CC} -dynamiclib -compatibility_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -current_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -install_name \${INST_DIR}/lib/lib\${LIB_NAME}\${SHLIB_SUFFIX}"
+-	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
++	    SHLIB_LD="${CC} -dynamiclib -compatibility_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -current_version \${GRASS_VERSION_MAJOR}.\${GRASS_VERSION_MINOR} -install_name @rpath/lib\${LIB_NAME}\${SHLIB_SUFFIX}"
++	    LD_LIBRARY_PATH_VAR="LD_RUN_PATH"
+ 	    ;;
+ 	*-sun-solaris*)
+ 	    # Note: If _REENTRANT isn't defined, then Solaris
