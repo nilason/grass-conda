@@ -21,6 +21,7 @@
 
 BASH=/bin/bash
 THIS_SCRIPT=`basename $0`
+export CONDA_ARCH=$(uname -m)
 export THIS_SCRIPT_DIR=$(cd $(dirname "$0"); pwd)
 export EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
 SDK=
@@ -34,10 +35,11 @@ GRASS_VERSION_DATE=
 PATCH_DIR=
 GRASS_APP_NAME=""
 GRASS_APP_BUNDLE=""
-CONDA_STABLE_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-stable.txt"
-CONDA_DEV_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-dev.txt"
+CONDA_STABLE_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-stable-${CONDA_ARCH}.txt"
+CONDA_DEV_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-dev-${CONDA_ARCH}.txt"
 CONDA_REQ_FILE="$CONDA_STABLE_FILE"
 CONDA_BIN=
+CONDA_TEMP_DIR=$(mktemp -d -t GRASS)
 DMG_TITLE=
 DMG_NAME=
 DMG_OUT_DIR=
@@ -45,7 +47,8 @@ BUNDLE_VERSION=
 REPACKAGE=0
 CONDA_UPDATE_STABLE=0
 WITH_LIBLAS=0
-MINICONDA_URL="https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
+MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
+Mambaforge-MacOSX-${CONDA_ARCH}.sh"
 
 # read in configurations
 source "${THIS_SCRIPT_DIR}/configure-build.sh"
@@ -79,8 +82,8 @@ Arguments:
   --with-liblas         Include libLAS support, optional, default is no support.
   -u
   --update-conda-stable Update the stable explicit conda requirement file. This
-                        is only allowed if conda-requirements-dev.txt is used
-                        (with --conda-file), to keep the two files in sync.
+                        is only allowed if conda-requirements-dev-[arm64|x86_64].txt
+                        is used (with --conda-file), to keep the two files in sync.
   -r
   --repackage           Recreate dmg file from previously built app,
                         setting [-o | --dmg-out-dir] is a requirement.
@@ -99,6 +102,7 @@ function exit_nice () {
     error_code=$1
     if [[ "$#" -eq 2 && $2 = "cleanup" ]]; then
         reset_grass_patches
+        rm -rf "$CONDA_TEMP_DIR"
     fi
     exit $error_code
 }
@@ -118,7 +122,7 @@ function read_grass_version () {
     GRASS_APP_NAME="GRASS-$GRASS_VERSION_MAJOR.$GRASS_VERSION_MINOR.app"
     GRASS_APP_BUNDLE="/Applications/$GRASS_APP_NAME"
     DMG_TITLE="GRASS-GIS-${GRASS_VERSION}"
-    DMG_NAME="grass-${GRASS_VERSION}.dmg"
+    DMG_NAME="grass-${GRASS_VERSION}-${CONDA_ARCH}.dmg"
 }
 
 # This set the build version for CFBundleVersion, in case of dev version the
@@ -205,35 +209,30 @@ function set_up_conda () {
     fi
 
     # download miniconda if not already existing
-    local miniconda="${EXTERNAL_DIR}/miniconda3.sh"
+    local miniconda="${EXTERNAL_DIR}/miniconda3-${CONDA_ARCH}.sh"
     if [ ! -f "$miniconda" ]; then
-        curl "$MINICONDA_URL" --output "$miniconda"
+        curl -L "$MINICONDA_URL" --output "$miniconda"
         [ $? -ne 0 ] && exit_nice $? cleanup
     fi
 
-    $BASH "$miniconda" -b -f -p "$GRASS_APP_BUNDLE/Contents/Resources"
-    export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
-    CONDA_BIN=$GRASS_APP_BUNDLE/Contents/Resources/condabin/conda
+    $BASH "$miniconda" -b -f -p "$CONDA_TEMP_DIR"
+    CONDA_BIN="$CONDA_TEMP_DIR/bin/mamba"
     if [ ! -f "$CONDA_BIN" ]; then
         echo "Error, could not find conda binary file at ${CONDA_BIN}"
         exit_nice 1 cleanup
     fi
-    $CONDA_BIN install --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
-        --file="${CONDA_REQ_FILE}" -c conda-forge
+
+    $CONDA_BIN create --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
+        --file="${CONDA_REQ_FILE}" -c conda-forge    
     [ $? -ne 0 ] && exit_nice $? cleanup
+
+    export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
 }
 
 function install_grass_session () {
     local python_bin="$GRASS_APP_BUNDLE/Contents/Resources/bin/python"
     $python_bin -m pip install --upgrade pip
     $python_bin -m pip install grass-session
-}
-
-function use_python_framework_build () {
-    pushd "$GRASS_APP_BUNDLE/Contents/Resources/bin" > /dev/null
-    ln -sf pythonw python3
-    ln -sf pythonw python
-    popd > /dev/null
 }
 
 function create_dmg () {
@@ -447,13 +446,6 @@ mkdir -p $EXTERNAL_DIR
 
 set_up_conda
 
-# fix for miniconda python.app installer bug
-if [[ -d $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp/Contents ]]; then
-    mv $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp/Contents/* \
-        $GRASS_APP_BUNDLE/Contents/Resources/python.app/Contents
-    rm -rf $GRASS_APP_BUNDLE/Contents/Resources/python.app/pythonapp
-fi
-
 install_grass_session
 
 export BUILD_SDK=$SDK
@@ -507,32 +499,20 @@ fi
 # default/conda-requirements-dev.txt is used, to keep the two files in sync
 if [[ "$CONDA_UPDATE_STABLE" -eq 1 && \
     "$CONDA_REQ_FILE" = "$CONDA_DEV_FILE" ]]; then
-    $CONDA_BIN list --explicit > "$CONDA_STABLE_FILE"
+    $CONDA_BIN list -p "$GRASS_APP_BUNDLE/Contents/Resources" \
+        --explicit > "$CONDA_STABLE_FILE"
 fi
 
 # print list of installed packages
 echo "================================================================="
 echo
-$CONDA_BIN list
+$CONDA_BIN list -p "$GRASS_APP_BUNDLE/Contents/Resources"
 if [[ "$WITH_LIBLAS" -eq 1 ]]; then
     liblas_version=`$GRASS_APP_BUNDLE/Contents/Resources/bin/liblas-config --version`
     echo "libLAS                    ${liblas_version}"
 fi
 echo
 echo "================================================================="
-
-# save some disk space
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/build-1
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/conda-meta
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/condabin
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/envs
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgconfig
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/pkgs
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/shell
-rm -rf $GRASS_APP_BUNDLE/Contents/Resources/var
-
-# relink python to framework build
-use_python_framework_build
 
 # create dmg file
 if [[ ! -z "$DMG_OUT_DIR" ]]; then

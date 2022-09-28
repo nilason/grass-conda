@@ -24,13 +24,12 @@ export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
 if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 79 ]; then
   export LDFLAGS="-Wl,-rpath,$PREFIX/lib"
-  export CFLAGS="-O2 -pipe -arch x86_64 -DGL_SILENCE_DEPRECATION"
-  export CXXFLAGS="-O2 -pipe -stdlib=libc++ -arch x86_64"
+  export CFLAGS="-O2 -pipe -arch ${CONDA_ARCH} -DGL_SILENCE_DEPRECATION"
+  export CXXFLAGS="-O2 -pipe -stdlib=libc++ -arch ${CONDA_ARCH}"
 fi
 
 CONFIGURE_FLAGS="\
   --with-macosx-sdk=$CONDA_BUILD_SYSROOT \
-  --with-macosx-archs="x86_64" \
   --with-opengl=aqua \
   --with-openmp \
   --prefix=$PREFIX \
