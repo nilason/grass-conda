@@ -50,6 +50,22 @@ WITH_LIBLAS=0
 MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
 Mambaforge-MacOSX-${CONDA_ARCH}.sh"
 
+# patch needed for GRASS 8.0+
+IFS='' read -r -d '' inst_dir_patch <<'EOF'
+--- include/Make/Platform.make.in.orig	2022-10-07 16:13:39.000000000 +0200
++++ include/Make/Platform.make.in	2022-10-07 16:17:02.000000000 +0200
+@@ -37,7 +37,7 @@
+ exec_prefix         = @exec_prefix@
+ ARCH                = @host@
+ UNIX_BIN            = @BINDIR@
+-INST_DIR            = @INSTDIR@
++INST_DIR            = @exec_prefix@
+ 
+ GRASS_HOME          = @GRASS_HOME@
+ RUN_GISBASE         = @GISBASE@
+EOF
+
+
 # read in configurations
 source "${THIS_SCRIPT_DIR}/configure-build.sh"
 
@@ -189,16 +205,24 @@ function make_app_bundle_dir () {
 }
 
 function patch_grass () {
-    for patchfile in "$PATCH_DIR/"*.patch; do
-        patch -d "$GRASSDIR" -p0 < "$patchfile"
-    done
+    if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 80 ]; then
+        echo "$inst_dir_patch" | patch -d "$GRASSDIR" -p0
+    else
+        for patchfile in "$PATCH_DIR/"*.patch; do
+            patch -d "$GRASSDIR" -p0 < "$patchfile"
+        done
+    fi
 }
 
 function reset_grass_patches () {
     echo "Reverting patches..."
-    for patchfile in "$PATCH_DIR/"*.patch; do
-        patch -d "$GRASSDIR" -R -p0 < "$patchfile"
-    done
+    if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 80 ]; then
+        echo "$inst_dir_patch" | patch -d "$GRASSDIR" -p0 -R
+    else
+        for patchfile in "$PATCH_DIR/"*.patch; do
+            patch -d "$GRASSDIR" -R -p0 < "$patchfile"
+        done
+    fi
     echo "Reverting patches done."
 }
 
@@ -388,7 +412,7 @@ fi
 read_grass_version
 set_bundle_version
 
-if [ ! -d  "$PATCH_DIR" ]; then
+if [[ ! -d  "$PATCH_DIR" && "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -le 80 ]]; then
     echo "Error, no patch directory \"$PATCH_DIR\" found"
     exit_nice 1
 fi
