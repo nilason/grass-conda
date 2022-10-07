@@ -30,8 +30,8 @@ export CC=$PREFIX/bin/clang
 export CXX=$PREFIX/bin/clang++
 export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
-export CFLAGS="-O2 -pipe -arch x86_64"
-export CXXFLAGS="-O2 -pipe -arch x86_64 -stdlib=libc++"
+export CFLAGS="-O2 -pipe -arch ${CONDA_ARCH}"
+export CXXFLAGS="-O2 -pipe -arch ${CONDA_ARCH} -stdlib=libc++"
 CMAKE=$PREFIX/bin/cmake
 
 if [ ! -f "$liblas_zipfile" ]; then
@@ -76,6 +76,20 @@ patch -d "$liblas_source_dir" -p0 << EOF
      if( oSRS.exportToWkt( &pszWKT ) == OGRERR_NONE )
          return pszWKT;
 
+EOF
+
+# patch for missing architecture in endian detection
+patch -d "$liblas_source_dir" -p0 << EOF
+--- include/liblas/detail/endian.hpp.orig	2021-01-20 18:24:39.000000000 +0100
++++ include/liblas/detail/endian.hpp	2022-09-27 18:21:23.000000000 +0200
+@@ -88,6 +88,7 @@
+    || defined(_M_ALPHA) || defined(__amd64) \\
+    || defined(__amd64__) || defined(_M_AMD64) \\
+    || defined(__x86_64) || defined(__x86_64__) \\
++   || defined(__arm64) || defined(__arm64__) \\
+    || defined(_M_X64)
+ 
+ # define LIBLAS_LITTLE_ENDIAN
 EOF
 
 LIBLAS_CONFIGURE_FLAGS="

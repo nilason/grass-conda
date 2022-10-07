@@ -65,7 +65,7 @@ export GRASS_FONT_CAP
 export GDAL_DATA="$GISBASE/share/gdal"
 
 # set Python
-export GRASS_PYTHON="$GISBASE/bin/python3"
+export GRASS_PYTHON="$GISBASE/python.app/Contents/MacOS/python"
 
 # start GRASS
 "$GRASS_PYTHON" "$GISBASE/bin/@GRASSBIN@" "--gui" "$@"
