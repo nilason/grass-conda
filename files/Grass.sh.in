@@ -1,19 +1,19 @@
 #! /bin/bash
 #############################################################################
 #
-# MODULE:   	GRASS Initialization
-# AUTHOR(S):	Justin Hickey - Thailand - jhickey@hpcc.nectec.or.th
-#             William Kyngesburye - kyngchaos@kyngchaos.com
-#             Eric Hutton
-#             Michael Barton - michael.barton@asu.edu
-# PURPOSE:  	The source file for this shell script is in
-#   	    	macosx/app/grass.sh.in and is the grass startup script for
-#               the Mac OS X application build.
-# COPYRIGHT:    (C) 2000-2018 by the GRASS Development Team
+# MODULE:        GRASS Initialization
+# AUTHOR(S):     Justin Hickey - Thailand - jhickey@hpcc.nectec.or.th
+#                William Kyngesburye - kyngchaos@kyngchaos.com
+#                Eric Hutton
+#                Michael Barton - michael.barton@asu.edu
+# PURPOSE:       The source file for this shell script is in
+#                macosx/app/grass.sh.in and is the grass startup script for
+#                the Mac OS X application build.
+# COPYRIGHT:     (C) 2000-2018 by the GRASS Development Team
 #
-#               This program is free software under the GNU General Public
-#   	    	License (>=v2). Read the file COPYING that comes with GRASS
-#   	    	for details.
+#                This program is free software under the GNU General Public
+#                License (>=v2). Read the file COPYING that comes with GRASS
+#                for details.
 #
 #############################################################################
 
