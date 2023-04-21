@@ -35,3 +35,4 @@ postgresql
 # postgis>=3.1.4
 cmake
 llvm-openmp
+git
