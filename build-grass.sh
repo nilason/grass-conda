@@ -190,7 +190,11 @@ function make_app_bundle_dir () {
         "$macos_dir/build_gui_user_menu.sh"
     cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
         "$macos_dir/build_html_user_index.sh"
-    cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/GRASS"
+    if [ "$GRASS_VERSION" = "7.9.dev" ]; then
+        cp -p "$THIS_SCRIPT_DIR/files/Grass-7.9.dev" "$macos_dir/GRASS"
+    else
+        cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/GRASS"
+    fi
     cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
     cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
         "$resources_dir/GRASSDocument_gxw.icns"
