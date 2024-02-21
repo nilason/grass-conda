@@ -52,8 +52,8 @@ mkdir -p "$GISBASE_USER/Addons/lib"
 mkdir -p "$GISBASE_USER/Addons/docs/html"
 
 # rebuild addon html index and gui menus
-"$app_dir/Contents/MacOS/build_html_user_index.sh" "$GISBASE"
-"$app_dir/Contents/MacOS/build_gui_user_menu.sh"
+# "$app_dir/Contents/MacOS/build_html_user_index.sh" "$GISBASE"
+# "$app_dir/Contents/MacOS/build_gui_user_menu.sh"
 
 # user fontcap files
 if [ ! "$GRASS_FONT_CAP" ] ; then

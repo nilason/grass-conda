@@ -186,11 +186,12 @@ function make_app_bundle_dir () {
     fi
     sed "s|@GRASSBIN@|$grassbin|g" \
         "$THIS_SCRIPT_DIR/files/$grass_bin_in" > "$macos_dir/Grass.sh"
-    cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
-        "$macos_dir/build_gui_user_menu.sh"
-    cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
-        "$macos_dir/build_html_user_index.sh"
+    # cp -p "$GRASSDIR/macosx/app/build_gui_user_menu.sh" \
+    #     "$macos_dir/build_gui_user_menu.sh"
+    # cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
+    #     "$macos_dir/build_html_user_index.sh"
     cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/GRASS"
+    cp -p "$THIS_SCRIPT_DIR/files/grass.scpt" "${macos_dir}/grass.scpt"
     cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
     cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
         "$resources_dir/GRASSDocument_gxw.icns"
@@ -198,10 +199,15 @@ function make_app_bundle_dir () {
     chmod 0644 "$contents_dir/Info.plist"
     chmod 0755 "$macos_dir/build_gui_user_menu.sh"
     chmod 0755 "$macos_dir/build_html_user_index.sh"
-    chmod 0755 "$macos_dir/Grass"
     chmod 0755 "$macos_dir/Grass.sh"
     chmod 0644 "$resources_dir/AppIcon.icns"
     chmod 0644 "$resources_dir/GRASSDocument_gxw.icns"
+
+    swiftc -v "$THIS_SCRIPT_DIR/files/main.swift" \
+        -sdk "$SDK" \
+        -target "${CONDA_ARCH}-apple-macos${DEPLOYMENT_TARGET}" \
+        -o "$macos_dir/GRASS"
+    [ $? -ne 0 ] && exit_nice $? cleanup
 }
 
 function patch_grass () {
