@@ -197,8 +197,8 @@ function make_app_bundle_dir () {
         "$resources_dir/GRASSDocument_gxw.icns"
 
     chmod 0644 "$contents_dir/Info.plist"
-    chmod 0755 "$macos_dir/build_gui_user_menu.sh"
-    chmod 0755 "$macos_dir/build_html_user_index.sh"
+    # chmod 0755 "$macos_dir/build_gui_user_menu.sh"
+    # chmod 0755 "$macos_dir/build_html_user_index.sh"
     chmod 0755 "$macos_dir/Grass.sh"
     chmod 0644 "$resources_dir/AppIcon.icns"
     chmod 0644 "$resources_dir/GRASSDocument_gxw.icns"
