@@ -190,7 +190,6 @@ function make_app_bundle_dir () {
     #     "$macos_dir/build_gui_user_menu.sh"
     # cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
     #     "$macos_dir/build_html_user_index.sh"
-    cp -p "$THIS_SCRIPT_DIR/files/Grass" "$macos_dir/GRASS"
     cp -p "$THIS_SCRIPT_DIR/files/grass.scpt" "${macos_dir}/grass.scpt"
     cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
     cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
