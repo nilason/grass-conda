@@ -17,7 +17,7 @@ NSURL *mainExecutableParentDir(void) {
     char *buf = (char *)malloc(sizeof(char) * bufSize);
     if (_NSGetExecutablePath(buf, &bufSize) < 0) {
       free(buf);
-      return NULL;
+      return nil;
     }
     url = [NSURL fileURLWithFileSystemRepresentation:buf
                                          isDirectory:NO
