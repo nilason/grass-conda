@@ -202,11 +202,16 @@ function make_app_bundle_dir () {
     chmod 0644 "$resources_dir/AppIcon.icns"
     chmod 0644 "$resources_dir/GRASSDocument_gxw.icns"
 
-    swiftc -v "$THIS_SCRIPT_DIR/files/main.swift" \
-        -sdk "$SDK" \
+    # swiftc -v "$THIS_SCRIPT_DIR/files/main.swift" \
+    #     -sdk "$SDK" \
+    #     -target "${CONDA_ARCH}-apple-macos${DEPLOYMENT_TARGET}" \
+    #     -o "$macos_dir/GRASS"
+    clang -x objective-c "-mmacosx-version-min=${DEPLOYMENT_TARGET}" \
         -target "${CONDA_ARCH}-apple-macos${DEPLOYMENT_TARGET}" \
-        -o "$macos_dir/GRASS"
-    [ $? -ne 0 ] && exit_nice $? cleanup
+        -mmacosx-version-min=${DEPLOYMENT_TARGET}  \
+        -isysroot "$SDK" -fobjc-arc -Os \
+        -o "$macos_dir/GRASS" "$THIS_SCRIPT_DIR/files/main.m"
+    [ $? -ne 0 ] && exit_nice $?
 }
 
 function patch_grass () {
