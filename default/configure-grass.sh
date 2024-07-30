@@ -42,8 +42,7 @@ CONFIGURE_FLAGS="\
   --with-proj-libs=$PREFIX/lib \
   --with-proj-share=$PREFIX/share/proj \
   --with-geos=$PREFIX/bin/geos-config \
-  --with-png-includes=$PREFIX/include \
-  --with-png-libs=$PREFIX/lib \
+  --with-libpng=$PREFIX/bin/libpng-config \
   --with-tiff-includes=$PREFIX/include \
   --with-tiff-libs=$PREFIX/lib \
   --with-postgres=yes \
@@ -75,6 +74,7 @@ CONFIGURE_FLAGS="\
   --with-lapack-libs=$PREFIX/lib \
   --with-netcdf=$PREFIX/bin/nc-config \
   --with-nls \
+  --with-libsvm \
   --with-libs=$PREFIX/lib \
   --with-includes=$PREFIX/include \
   --with-pdal=$PREFIX/bin/pdal-config \
