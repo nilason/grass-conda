@@ -48,7 +48,7 @@ REPACKAGE=0
 CONDA_UPDATE_STABLE=0
 WITH_LIBLAS=0
 MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
-Mambaforge-MacOSX-${CONDA_ARCH}.sh"
+Miniforge3-MacOSX-${CONDA_ARCH}.sh"
 
 # patch needed for GRASS 8.0+
 IFS='' read -r -d '' inst_dir_patch <<'EOF'

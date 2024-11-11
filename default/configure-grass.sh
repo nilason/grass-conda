@@ -23,7 +23,7 @@ export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
 
 if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 79 ]; then
-  export LDFLAGS="-Wl,-rpath,$PREFIX/lib"
+  export LDFLAGS="-fuse-ld=lld -Wl,-rpath,$PREFIX/lib"
   export CFLAGS="-O2 -pipe -arch ${CONDA_ARCH} -DGL_SILENCE_DEPRECATION"
   export CXXFLAGS="-O2 -pipe -stdlib=libc++ -arch ${CONDA_ARCH}"
 fi
@@ -66,12 +66,6 @@ CONFIGURE_FLAGS="\
   --with-bzlib-libs=$PREFIX/lib \
   --with-bzlib-includes=$PREFIX/include \
   --with-netcdf=$PREFIX/bin/nc-config \
-  --with-blas \
-  --with-blas-libs=$PREFIX/lib \
-  --with-blas-includes=$PREFIX/include \
-  --with-lapack
-  --with-lapack-includes=$PREFIX/include \
-  --with-lapack-libs=$PREFIX/lib \
   --with-netcdf=$PREFIX/bin/nc-config \
   --with-nls \
   --with-libsvm \
@@ -82,6 +76,24 @@ CONFIGURE_FLAGS="\
   --with-readline-includes=$PREFIX/include/readline \
   --with-readline-libs=$PREFIX/lib
 "
+
+if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -ge 85 ]; then
+  CONFIGURE_FLAGS="\
+      ${CONFIGURE_FLAGS} \
+      --with-blas=openblas \
+      --with-lapack=openblas
+  "
+else
+  CONFIGURE_FLAGS="\
+      ${CONFIGURE_FLAGS} \
+        --with-blas \
+        --with-blas-libs=$PREFIX/lib \
+        --with-blas-includes=$PREFIX/include \
+        --with-lapack \
+        --with-lapack-includes=$PREFIX/include \
+        --with-lapack-libs=$PREFIX/lib
+  "
+fi
 
 if [[ "$WITH_LIBLAS" -eq 1 ]]; then
     CONFIGURE_FLAGS="\

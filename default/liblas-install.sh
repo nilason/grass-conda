@@ -32,6 +32,7 @@ export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
 export CONDA_BUILD_SYSROOT=$BUILD_SDK
 export CFLAGS="-O2 -pipe -arch ${CONDA_ARCH}"
 export CXXFLAGS="-O2 -pipe -arch ${CONDA_ARCH} -stdlib=libc++"
+export LDFLAGS="-fuse-ld=lld"
 CMAKE=$PREFIX/bin/cmake
 
 if [ ! -f "$liblas_zipfile" ]; then

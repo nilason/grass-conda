@@ -1,9 +1,10 @@
 blas
 boost
 cairo
-clang_osx-64
 clangxx_osx-64
+clang_osx-64
 cmake
+expat
 fftw
 freetype
 geos
@@ -11,7 +12,6 @@ gettext
 ghostscript
 giflib
 git
-libjpeg-turbo
 krb5
 lapack
 lastools
@@ -25,9 +25,11 @@ libgdal-pg
 libgdal-postgisraster
 libgdal-tiledb
 libiconv
+libjpeg-turbo
 libpng
 libsvm
 libtiff
+lld
 llvm-openmp
 matplotlib
 numpy
@@ -38,8 +40,8 @@ pkg-config
 ply
 postgresql
 proj
-python<3.12
 python.app
+python<3.13
 setuptools
 six
 sqlite
