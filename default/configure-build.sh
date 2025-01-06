@@ -13,3 +13,8 @@ GRASSDIR=""
 # setting CONDA_REQ_FILE here is optional (default/conda-requirements-stable.txt
 # is used by default)
 # CONDA_REQ_FILE="${THIS_SCRIPT_DIR}/default/conda-requirements-dev-x86_64.txt"
+
+# CS_ENTITLEMENTS=""
+CS_IDENT=""
+CS_KEYCHAIN_PROFILE=""
+CS_PROVISIONPROFILE=""

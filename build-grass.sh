@@ -50,6 +50,16 @@ CONDA_UPDATE_STABLE=0
 WITH_LIBLAS=0
 MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
 Miniforge3-MacOSX-${CONDA_ARCH}.sh"
+CS_ENTITLEMENTS="${THIS_SCRIPT_DIR}/files/grass.entitlements"
+CS_IDENT=
+CS_KEYCHAIN_PROFILE=
+CS_PROVISIONPROFILE=
+NOTARIZE=0
+
+CODESIGN=/usr/bin/codesign
+DITTO=/usr/bin/ditto
+INSTALL_NAME_TOOL=/usr/bin/install_name_tool
+XCRUN=/usr/bin/xcrun
 
 export CONDA_ARCH
 export THIS_SCRIPT_DIR
@@ -269,10 +279,13 @@ function set_up_conda () {
     fi
 
     $CONDA_BIN create --yes -p "$GRASS_APP_BUNDLE/Contents/Resources" \
-        --file="${CONDA_REQ_FILE}" -c conda-forge    
+        --file="${CONDA_REQ_FILE}" -c conda-forge
     [ $? -ne 0 ] && exit_nice $? cleanup
 
     export PATH="$GRASS_APP_BUNDLE/Contents/Resources/bin:$PATH"
+
+    # remove, causing Notarization issues
+    rm -rf "$GRASS_APP_BUNDLE/Contents/Resources/share/gdb"
 }
 
 function install_grass_session () {
@@ -366,6 +379,95 @@ function remove_dmg () {
     rm -rf "${DMG_OUT_DIR:?}/${DMG_NAME:?}"
 }
 
+function codesign_app () {
+    local bins
+    local grass_libs
+    local libs
+
+    pushd "${GRASS_APP_BUNDLE}/Contents" > /dev/null || exit $?
+
+    # remove build stage rpaths from grass libraries
+
+    grass_libs=$(find ./Resources -type f \(  -name "*libgrass_*.dylib" \))
+
+    while IFS= read -r file || [[ -n $file ]]; do
+        rpath=$(otool -l "$file" | grep "dist.*/lib" | awk '{$1=$1};1' | cut -d " " -f 2)
+        if [[ -n "$rpath" ]]; then
+            "$INSTALL_NAME_TOOL" -delete_rpath "$rpath" "$file"
+        fi
+    done < <(printf '%s\n' "$grass_libs")
+
+    # codesign embedded libraries
+
+    libs=$(find ./Resources -type f \( -name "*.so" -or -name "*.dylib" \))
+
+    while IFS= read -r file || [[ -n $file ]]; do
+        "$CODESIGN" --sign "${CS_IDENT}" --force --verbose --timestamp "${file}" &
+    done < <(printf '%s\n' "$libs")
+    wait
+
+    # codesign embedded binaries
+
+    bins=$(find ./Resources -type f -perm +111 ! \( -name "*.so" -or -name "*.dylib" -or -name "*.a" \
+        -or -name "*.py" -or -name "*.sh" \) -exec file '{}' \; | \
+        grep "x86_64\|arm64" | \
+        cut -d ":" -f 1 | \
+        grep -v "for architecture")
+    wait
+
+    while IFS= read -r file || [[ -n $file ]]; do
+        "$CODESIGN" --sign "${CS_IDENT}" --force --verbose --timestamp --options runtime \
+          --entitlements "$CS_ENTITLEMENTS" "${file}" &
+    done < <(printf '%s\n' "$bins")
+    wait
+
+    # codesign "extra" files in ./MacOS directory
+
+    "$CODESIGN" --sign "${CS_IDENT}" --force --verbose --timestamp --options runtime \
+        --entitlements "$CS_ENTITLEMENTS" "./MacOS/Grass.sh"
+    "$CODESIGN" --sign "${CS_IDENT}" --force --verbose --timestamp --options runtime \
+        --entitlements "$CS_ENTITLEMENTS" "./MacOS/grass.scpt"
+
+    # cp "$CS_PROVISIONPROFILE" embedded.provisionprofile
+    # xattr -r -d com.apple.FinderInfo embedded.provisionprofile
+
+    popd > /dev/null || exit $?
+
+    # codesign the app bundle
+
+    "$CODESIGN" --force --verbose --timestamp --sign "$CS_IDENT" --options runtime \
+        --entitlements "$CS_ENTITLEMENTS" "$GRASS_APP_BUNDLE"
+}
+
+function codesign_dmg () {
+    "$CODESIGN" --force --verbose --timestamp --sign "$CS_IDENT" --options runtime \
+        --entitlements "$CS_ENTITLEMENTS" "${DMG_OUT_DIR}/${DMG_NAME}"
+}
+
+function notarize_app () {
+    local tmpdir
+    local zip_tmpfile
+
+    tmpdir=$(mktemp -d /tmp/org.osgeo.grass.XXXXXX)
+    zip_tmpfile="${tmpdir}/${GRASS_APP_NAME}.zip"
+
+    "$DITTO" -c -k --keepParent "$GRASS_APP_BUNDLE" "$zip_tmpfile"
+
+    "$XCRUN" notarytool submit "$zip_tmpfile" \
+        --keychain-profile "$CS_KEYCHAIN_PROFILE" --wait
+
+    "$XCRUN" stapler staple "$GRASS_APP_BUNDLE"
+    "$XCRUN" stapler  validate "$GRASS_APP_BUNDLE"
+
+    rm -rf "$tmpdir"
+}
+
+function notarize_dmg () {
+    "$XCRUN" notarytool submit "${DMG_OUT_DIR}/${DMG_NAME}" \
+        --keychain-profile "$CS_KEYCHAIN_PROFILE" --wait
+
+    "$XCRUN" stapler staple "${DMG_OUT_DIR}/${DMG_NAME}"
+}
 
 #############################################################################
 # Read script arguments
@@ -396,6 +498,9 @@ while [ "$1" != "" ]; do
         ;;
         -u | --update-conda-stable )
         CONDA_UPDATE_STABLE=1
+        ;;
+        --notarize )
+        NOTARIZE=1
         ;;
         -h | --help )
         display_usage
@@ -477,6 +582,12 @@ if [[ -d  "$GRASS_APP_BUNDLE" && "$REPACKAGE" -eq 0 ]]; then
             * ) echo "Please answer yes or no.";;
         esac
     done
+fi
+
+if [[ "$NOTARIZE" -eq 1 && ( -z $CS_IDENT || -z $CS_KEYCHAIN_PROFILE || -z $CS_PROVISIONPROFILE ) ]]; then
+    echo "Error, attempt to notarize the app without setting necessary"
+    echo "code signing identity, provision profile and keychain profile."
+    exit_nice 1
 fi
 
 #############################################################################
@@ -565,9 +676,18 @@ fi
 echo
 echo "================================================================="
 
+if [[ "$NOTARIZE" -eq 1 ]]; then
+    codesign_app
+    notarize_app
+fi
+
 # create dmg file
 if [[ -n "$DMG_OUT_DIR" ]]; then
     create_dmg
+    if [[ "$NOTARIZE" -eq 1 ]]; then
+        codesign_dmg
+        notarize_dmg
+    fi
 fi
 
 exit_nice 0 cleanup
