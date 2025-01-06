@@ -20,10 +20,10 @@
 #
 
 BASH=/bin/bash
-THIS_SCRIPT=`basename $0`
-export CONDA_ARCH=$(uname -m)
-export THIS_SCRIPT_DIR=$(cd $(dirname "$0"); pwd)
-export EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
+THIS_SCRIPT=$(basename "$0")
+CONDA_ARCH=$(uname -m)
+THIS_SCRIPT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
+EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
 CONFIG_HOME="$HOME/.config"
 SDK=
 GRASSDIR=
@@ -51,6 +51,10 @@ WITH_LIBLAS=0
 MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
 Miniforge3-MacOSX-${CONDA_ARCH}.sh"
 
+export CONDA_ARCH
+export THIS_SCRIPT_DIR
+export EXTERNAL_DIR
+
 # patch needed for GRASS 8.0+
 IFS='' read -r -d '' inst_dir_patch <<'EOF'
 --- include/Make/Platform.make.in.orig	2022-10-07 16:13:39.000000000 +0200
@@ -68,10 +72,10 @@ EOF
 
 
 # read in configurations
-if [ ! -z "$XDG_CONFIG_HOME"]; then
+if [ -n "$XDG_CONFIG_HOME" ]; then
     CONFIG_HOME="$XDG_CONFIG_HOME"
 fi
-if [ -f  "${CONFIG_HOME}/grass/configure-build-${CONDA_ARCH}.sh" ]; then
+if [ -f "${CONFIG_HOME}/grass/configure-build-${CONDA_ARCH}.sh" ]; then
     source "${CONFIG_HOME}/grass/configure-build-${CONDA_ARCH}.sh"
 fi
 
@@ -126,13 +130,13 @@ function exit_nice () {
         reset_grass_patches
         rm -rf "$CONDA_TEMP_DIR"
     fi
-    exit $error_code
+    exit "$error_code"
 }
 
 function read_grass_version () {
     local versionfile="${GRASSDIR}/include/VERSION"
     local arr=()
-    while read line; do
+    while read -r line; do
         arr+=("$line")
     done < "$versionfile"
     GRASS_VERSION_MAJOR=${arr[0]}
@@ -150,20 +154,22 @@ function read_grass_version () {
 # This set the build version for CFBundleVersion, in case of dev version the
 # git short commit hash number is added.
 function set_bundle_version () {
-    pushd "$GRASSDIR" > /dev/null
+    pushd "$GRASSDIR" > /dev/null || exit
     BUNDLE_VERSION=$GRASS_VERSION
 
-    local is_git_repo=`git rev-parse --is-inside-work-tree 2> /dev/null`
+    local is_git_repo
+    is_git_repo=$(git rev-parse --is-inside-work-tree 2> /dev/null)
     if [[ ! $? -eq 0 && ! "$is_git_repo" = "true" ]]; then
-        popd > /dev/null
+        popd > /dev/null || exit
         return
     fi
 
     if [[ "$GRASS_VERSION_RELEASE" = *"dev"* ]]; then
-        local git_commit=`git rev-parse --short HEAD`
+        local git_commit
+        git_commit=$(git rev-parse --short HEAD)
         BUNDLE_VERSION="${BUNDLE_VERSION} \(${git_commit}\)"
     fi
-    popd > /dev/null
+    popd > /dev/null || exit
 }
 
 function make_app_bundle_dir () {
@@ -214,7 +220,7 @@ function make_app_bundle_dir () {
     #     -o "$macos_dir/GRASS"
     clang -x objective-c "-mmacosx-version-min=${DEPLOYMENT_TARGET}" \
         -target "${CONDA_ARCH}-apple-macos${DEPLOYMENT_TARGET}" \
-        -mmacosx-version-min=${DEPLOYMENT_TARGET}  \
+        -mmacosx-version-min="$DEPLOYMENT_TARGET"  \
         -isysroot "$SDK" -fobjc-arc -Os \
         -o "$macos_dir/GRASS" "$THIS_SCRIPT_DIR/files/main.m"
     [ $? -ne 0 ] && exit_nice $?
@@ -284,24 +290,29 @@ function create_dmg () {
         exit_nice 1
     fi
 
-    local tmpdir=`mktemp -d /tmp/org.osgeo.grass.XXXXXX`
-    local dmg_tmpfile=${tmpdir}/grass-tmp-$$.dmg
-    local exact_app_size=`du -ks $GRASS_APP_BUNDLE | cut -f 1`
-    local dmg_size=$((exact_app_size*120/100))
+    local tmpdir
+    local dmg_tmpfile
+    local exact_app_size
+    local dmg_size
 
-    sudo hdiutil create -srcfolder $GRASS_APP_BUNDLE \
-        -volname $DMG_TITLE \
+    tmpdir=$(mktemp -d /tmp/org.osgeo.grass.XXXXXX)
+    dmg_tmpfile=${tmpdir}/grass-tmp-$$.dmg
+    exact_app_size=$(du -ks "$GRASS_APP_BUNDLE" | cut -f 1)
+    dmg_size=$((exact_app_size*120/100))
+
+    sudo hdiutil create -srcfolder "$GRASS_APP_BUNDLE" \
+        -volname "$DMG_TITLE" \
         -fs HFS+ \
         -fsargs "-c c=64,a=16,e=16" \
         -format UDRW \
-        -size ${dmg_size}k "${dmg_tmpfile}"
+        -size ${dmg_size}k "$dmg_tmpfile"
 
     if [ $? -ne 0 ]; then
-        rm -rf $tmpdir
+        rm -rf "$tmpdir"
         exit_nice $?
     fi
 
-    DEVICE=`sudo hdiutil attach -readwrite -noverify -noautoopen "${dmg_tmpfile}" | egrep '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}'`
+    DEVICE=$(sudo hdiutil attach -readwrite -noverify -noautoopen "${dmg_tmpfile}" | grep -E '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}')
     sudo hdiutil attach "${dmg_tmpfile}" || error "Can't attach temp DMG"
 
     mkdir -p "/Volumes/${DMG_TITLE}/.background"
@@ -333,26 +344,26 @@ EOF
     sync
     sync
     sleep 3
-    hdiutil detach $DEVICE
+    hdiutil detach "$DEVICE"
 
     hdiutil convert "${dmg_tmpfile}" \
         -format UDZO -imagekey zlib-level=9 -o "${DMG_OUT_DIR}/${DMG_NAME}"
 
     if [ $? -ne 0 ]; then
-        rm -rf $tmpdir
+        rm -rf "$tmpdir"
         exit_nice $?
     fi
 
-    rm -rf $tmpdir
+    rm -rf "$tmpdir"
     echo
 }
 
 function remove_dmg () {
     if [ -d "/Volumes/${DMG_TITLE}" ]; then
-        disk=`diskutil list | grep ${DMG_TITLE} | awk -F\  '{print $NF}'`
-        diskutil unmount $disk
+        disk=$(diskutil list | grep "$DMG_TITLE" | awk -F\  '{print $NF}')
+        diskutil unmount "$disk"
     fi
-    rm -rf "${DMG_OUT_DIR}/${DMG_NAME}"
+    rm -rf "${DMG_OUT_DIR:?}/${DMG_NAME:?}"
 }
 
 
@@ -405,7 +416,7 @@ done
 #############################################################################
 
 # make full path of CONDA_REQ_FILE
-CONDA_REQ_FILE=$(cd $(dirname "$CONDA_REQ_FILE") && pwd)/$(basename "$CONDA_REQ_FILE")
+CONDA_REQ_FILE=$(cd "$(dirname "$CONDA_REQ_FILE")" && pwd)/$(basename "$CONDA_REQ_FILE")
 
 if [ ! -f  "${SDK}/SDKSettings.plist" ]; then
     echo "Error, could not find valid MacOS SDK at $SDK"
@@ -415,8 +426,8 @@ fi
 
 # if DEPLOYMENT_TARGET hasn't been set, extract from SDK
 if [ -z "$DEPLOYMENT_TARGET" ]; then
-    DEPLOYMENT_TARGET=`plutil -extract DefaultProperties.MACOSX_DEPLOYMENT_TARGET xml1 \
-        -o - $SDK/SDKSettings.plist | awk -F '[<>]' '/string/{print $3}'`
+    DEPLOYMENT_TARGET=$(plutil -extract DefaultProperties.MACOSX_DEPLOYMENT_TARGET xml1 \
+-o - "$SDK/SDKSettings.plist" | awk -F '[<>]' '/string/{print $3}')
 fi
 
 if [ ! -d  "$GRASSDIR" ]; then
@@ -433,15 +444,15 @@ if [[ ! -d  "$PATCH_DIR" && "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -le 80 ]]
     exit_nice 1
 fi
 
-if [[ ! -z "$DMG_OUT_DIR" && ! -d  "$DMG_OUT_DIR" ]]; then
+if [[ -n "$DMG_OUT_DIR" && ! -d  "$DMG_OUT_DIR" ]]; then
     echo "Error, dmg output directory \"$DMG_OUT_DIR\" does not exist."
     exit_nice 1
 fi
 
-if [[ ! -z "$DMG_OUT_DIR" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
+if [[ -n "$DMG_OUT_DIR" && -f "${DMG_OUT_DIR}/${DMG_NAME}" ]]; then
     echo "Warning, there exists a dmg file \"${DMG_NAME}\" in \"${DMG_OUT_DIR}\"."
     while true; do
-        read -p "Do you wish to delete it (y|n)? " yn
+        read -r -p "Do you wish to delete it (y|n)? " yn
         case $yn in
             [Yy]* ) remove_dmg; break;;
             [Nn]* ) exit_nice 0;;
@@ -459,7 +470,7 @@ fi
 if [[ -d  "$GRASS_APP_BUNDLE" && "$REPACKAGE" -eq 0 ]]; then
     echo "Warning, \"$GRASS_APP_BUNDLE\" already exists."
     while true; do
-        read -p "Do you wish to delete it (y|n)? " yn
+        read -r -p "Do you wish to delete it (y|n)? " yn
         case $yn in
             [Yy]* ) rm -rf "$GRASS_APP_BUNDLE"; break;;
             [Nn]* ) exit_nice 0;;
@@ -473,7 +484,7 @@ fi
 #############################################################################
 
 # only create a new dmg file of existing app bundle
-if [[ ! -z "$DMG_OUT_DIR" && "$REPACKAGE" -eq 1 ]]; then
+if [[ -n "$DMG_OUT_DIR" && "$REPACKAGE" -eq 1 ]]; then
     create_dmg
     exit_nice 0
 fi
@@ -482,7 +493,7 @@ make_app_bundle_dir
 
 patch_grass
 
-mkdir -p $EXTERNAL_DIR
+mkdir -p "$EXTERNAL_DIR"
 
 set_up_conda
 
@@ -497,7 +508,7 @@ if [[ "$WITH_LIBLAS" -eq 1 ]]; then
 fi
 
 # configure and compile GRASS GIS
-pushd "$GRASSDIR" > /dev/null
+pushd "$GRASSDIR" > /dev/null || exit
 
 echo "Starting \"make distclean\"..."
 make distclean &>/dev/null
@@ -505,12 +516,12 @@ echo "Finished \"make distclean\""
 
 source "$THIS_SCRIPT_DIR/default/configure-grass.sh"
 
-make -j$(sysctl -n hw.ncpu) GDAL_DYNAMIC=
+make -j"$(sysctl -n hw.ncpu)"
 if [ $? -ne 0 ]; then
     echo "Compilation failed, you may need to reset the GRASS git repository."
     echo "This can be made with: \"cd [grass-source-dir] && git reset --hard\"."
     echo
-    popd > /dev/null
+    popd > /dev/null || exit
     exit_nice $?
 fi
 
@@ -521,18 +532,18 @@ if [ $? -ne 0 ]; then
     echo "Installation failed, you may need to reset the GRASS git repository."
     echo "This can be made with: \"cd [grass-source-dir] && git reset --hard\"."
     echo
-    popd > /dev/null
+    popd > /dev/null || exit
     exit_nice $?
 fi
 echo "Finished installation."
 
-popd > /dev/null
+popd > /dev/null || exit
 
 # replace SDK with a unversioned one of Command Line Tools
 FILE=$GRASS_APP_BUNDLE/Contents/Resources/include/Make/Platform.make
-sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" $FILE
+sed -i .bak "s|-isysroot $SDK|-isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk|g" "$FILE"
 if [ $? -eq 0 ]; then
-    rm -f $FILE.bak
+    rm -f "$FILE.bak"
 fi
 
 # update the stable conda explicit requirement file, this is only allowed if
@@ -548,14 +559,14 @@ echo "================================================================="
 echo
 $CONDA_BIN list -p "$GRASS_APP_BUNDLE/Contents/Resources"
 if [[ "$WITH_LIBLAS" -eq 1 ]]; then
-    liblas_version=`$GRASS_APP_BUNDLE/Contents/Resources/bin/liblas-config --version`
+    liblas_version=$("${GRASS_APP_BUNDLE}/Contents/Resources/bin/liblas-config" --version)
     echo "libLAS                    ${liblas_version}"
 fi
 echo
 echo "================================================================="
 
 # create dmg file
-if [[ ! -z "$DMG_OUT_DIR" ]]; then
+if [[ -n "$DMG_OUT_DIR" ]]; then
     create_dmg
 fi
 

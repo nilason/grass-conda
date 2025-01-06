@@ -14,9 +14,11 @@
 #
 #
 
-export PREFIX=$(python3 -c 'import sys; print(sys.prefix)')
+PREFIX=$(python3 -c 'import sys; print(sys.prefix)')
+export PREFIX
 export PATH=$PREFIX/bin:/usr/bin:/bin:/usr/sbin:/etc:/usr/lib
-export GRASS_PYTHON=$(which pythonw)
+GRASS_PYTHON=$(which pythonw)
+export GRASS_PYTHON
 export CC=$PREFIX/bin/clang
 export CXX=$PREFIX/bin/clang++
 export MACOSX_DEPLOYMENT_TARGET=$DEPLOYMENT_TARGET
