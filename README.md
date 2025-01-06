@@ -84,11 +84,12 @@ git checkout 7.8.5
 ```
 
 There are currently two required variables needed to be set either through
-editing the `configure-build.sh` file, or by giving them as arguments to the
-main script: `./build-grass.sh`.
+editing the `$HOME/.config/grass/configure-build-[arm64|x86_64].sh` file,
+or by giving them as arguments to the main script: `./build-grass.sh`.
 
-Argument given to `./build-grass.sh` will override settings in `configure-build.sh`.
-You can also do `./build-grass.sh --help` for info on possible configurations.
+Argument given to `./build-grass.sh` will override settings in
+`configure-build-[arm64|x86_64].sh`. You can also do
+`./build-grass.sh --help` for info on possible configurations.
 
 Required settings:
 
@@ -97,7 +98,7 @@ Required settings:
 - GRASSDIR full path to the GRASS GIS source directory (path may **not**
   contain spaces)
 
-Example with using settings in `configure-build.sh`:
+Example with using settings in `$HOME/.config/grass/configure-build-[arm64|x86_64].sh`:
 ```
 ./build-grass.sh
 ```
@@ -148,3 +149,14 @@ primarily intended to be used for updating this git repo.
 
 GRASS configure settings are set in `default/configure-grass.sh`. Changes to that
 file should reflect settings of conda environment.
+
+GRASS build configure settings can be set in configure files located in
+`$HOME/.config/grass` (or `$XDG_CONFIG_HOME/grass` if set), e.g.:
+
+```sh
+mkdir -p $HOME/.config/grass
+cp default/configure-build.sh $HOME/.config/grass/configure-build-arm64.sh
+cp default/configure-build.sh $HOME/.config/grass/configure-build-x86_64.sh
+```
+
+Edit the configure files to your needs.

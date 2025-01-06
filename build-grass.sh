@@ -24,6 +24,7 @@ THIS_SCRIPT=`basename $0`
 export CONDA_ARCH=$(uname -m)
 export THIS_SCRIPT_DIR=$(cd $(dirname "$0"); pwd)
 export EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
+CONFIG_HOME="$HOME/.config"
 SDK=
 GRASSDIR=
 DEPLOYMENT_TARGET=
@@ -67,7 +68,12 @@ EOF
 
 
 # read in configurations
-source "${THIS_SCRIPT_DIR}/configure-build.sh"
+if [ ! -z "$XDG_CONFIG_HOME"]; then
+    CONFIG_HOME="$XDG_CONFIG_HOME"
+fi
+if [ -f  "${CONFIG_HOME}/grass/configure-build-${CONDA_ARCH}.sh" ]; then
+    source "${CONFIG_HOME}/grass/configure-build-${CONDA_ARCH}.sh"
+fi
 
 #############################################################################
 # Functions
