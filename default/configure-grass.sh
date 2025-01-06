@@ -5,7 +5,7 @@
 # TOOL:         configure-grass.sh
 # AUTHOR(s):    Nicklas Larsson
 # PURPOSE:      Sets up configure and compiler flags and configures GRASS GIS
-# COPYRIGHT:    (c) 2020-2021 Nicklas Larsson
+# COPYRIGHT:    (c) 2020-2025 Nicklas Larsson
 #               This package is free software under the GNU General Public
 #               License (>=v2).
 #

@@ -5,7 +5,7 @@
 # TOOL:         build-grass.sh
 # AUTHOR(s):    Nicklas Larsson
 # PURPOSE:
-# COPYRIGHT:    (c) 2020-2021 Nicklas Larsson
+# COPYRIGHT:    (c) 2020-2025 Nicklas Larsson
 #               (c) 2020 Michael Barton
 #               (c) 2018 Eric Hutton, Community Surface Dynamics Modeling
 #                   System
