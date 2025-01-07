@@ -24,7 +24,6 @@ https://conda.anaconda.org/conda-forge/osx-64/libev-4.33-h10d778d_2.conda
 https://conda.anaconda.org/conda-forge/osx-64/libexpat-2.6.4-h240833e_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/libfabric1-2.0.0-h6e16a3a_1.conda
 https://conda.anaconda.org/conda-forge/osx-64/libffi-3.4.2-h0d85af4_5.tar.bz2
-https://conda.anaconda.org/conda-forge/osx-64/libgcc-4.8.5-1.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/libiconv-1.17-hd75f5a5_2.conda
 https://conda.anaconda.org/conda-forge/osx-64/libjpeg-turbo-3.0.0-h0dc2134_1.conda
 https://conda.anaconda.org/conda-forge/osx-64/liblzma-5.6.3-hd471939_1.conda
@@ -62,7 +61,6 @@ https://conda.anaconda.org/conda-forge/osx-64/gflags-2.2.2-hac325c4_1005.conda
 https://conda.anaconda.org/conda-forge/osx-64/ghostscript-10.04.0-hac325c4_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/gmp-6.3.0-hf036a51_2.conda
 https://conda.anaconda.org/conda-forge/osx-64/hdf4-4.2.15-h8138101_7.conda
-https://conda.anaconda.org/conda-forge/osx-64/lapack-3.6.1-0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/lastools-20171231-h046ec9c_1002.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/lerc-4.0.0-hb486fe8_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/libabseil-20240722.0-cxx17_h0e468a2_4.conda
@@ -73,7 +71,7 @@ https://conda.anaconda.org/conda-forge/osx-64/libbrotlienc-1.1.0-h00291cd_2.cond
 https://conda.anaconda.org/conda-forge/osx-64/libcrc32c-1.1.2-he49afe7_0.tar.bz2
 https://conda.anaconda.org/conda-forge/osx-64/libcxx-devel-19.1.6-h7c275be_1.conda
 https://conda.anaconda.org/conda-forge/osx-64/libde265-1.0.15-h7728843_0.conda
-https://conda.anaconda.org/conda-forge/osx-64/libedit-3.1.20191231-h0678c8f_2.tar.bz2
+https://conda.anaconda.org/conda-forge/osx-64/libedit-3.1.20240808-pl5321ha958ccf_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/libfabric-2.0.0-h694c41f_1.conda
 https://conda.anaconda.org/conda-forge/osx-64/libgfortran5-13.2.0-h2873a65_3.conda
 https://conda.anaconda.org/conda-forge/osx-64/libintl-0.22.5-hdfe23c8_3.conda
@@ -156,7 +154,7 @@ https://conda.anaconda.org/conda-forge/osx-64/libcurl-8.11.1-h5dec5d8_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/libgettextpo-devel-0.22.5-hdfe23c8_3.conda
 https://conda.anaconda.org/conda-forge/osx-64/libheif-1.19.5-gpl_hc62a4a2_100.conda
 https://conda.anaconda.org/conda-forge/osx-64/libopenblas-0.3.28-openmp_hbf64a52_1.conda
-https://conda.anaconda.org/conda-forge/osx-64/libpmix-5.0.5-h2a508f7_0.conda
+https://conda.anaconda.org/conda-forge/osx-64/libpmix-5.0.6-h2a508f7_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/libsuitesparseconfig-7.8.3-ss783_he344b7b.conda
 https://conda.anaconda.org/conda-forge/osx-64/libthrift-0.21.0-h75589b3_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/lld-19.1.6-hcd1802e_0.conda
@@ -227,12 +225,10 @@ https://conda.anaconda.org/conda-forge/noarch/compiler-rt_osx-64-19.1.6-hc6f8467
 https://conda.anaconda.org/conda-forge/osx-64/libcholmod-5.3.0-ss783_h7fe8f01.conda
 https://conda.anaconda.org/conda-forge/osx-64/libgdal-core-3.10.0-ha746336_13.conda
 https://conda.anaconda.org/conda-forge/osx-64/libgoogle-cloud-storage-2.33.0-h3f2b517_1.conda
-https://conda.anaconda.org/conda-forge/osx-64/liblapacke-3.9.0-26_osx64_openblas.conda
 https://conda.anaconda.org/conda-forge/osx-64/numpy-2.2.1-py312h22eab8f_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/postgresql-17.2-h9d4d8b1_1.conda
 https://conda.anaconda.org/conda-forge/osx-64/aws-crt-cpp-0.29.7-hd560ef9_7.conda
 https://conda.anaconda.org/conda-forge/osx-64/azure-storage-files-datalake-cpp-12.12.0-h86941f0_1.conda
-https://conda.anaconda.org/conda-forge/osx-64/blas-devel-3.9.0-26_osx64_openblas.conda
 https://conda.anaconda.org/conda-forge/osx-64/compiler-rt-19.1.6-h52031e2_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/contourpy-1.3.1-py312hc47a885_0.conda
 https://conda.anaconda.org/conda-forge/osx-64/libboost-python-1.85.0-py312h44e70fa_4.conda
@@ -247,7 +243,6 @@ https://conda.anaconda.org/conda-forge/osx-64/libspqr-4.3.4-ss783_h0b03d82.conda
 https://conda.anaconda.org/conda-forge/osx-64/libumfpack-6.3.5-ss783_h53c776b.conda
 https://conda.anaconda.org/conda-forge/osx-64/wxpython-4.2.2-py312h97a8bdf_3.conda
 https://conda.anaconda.org/conda-forge/osx-64/aws-sdk-cpp-1.11.458-ha9aef39_4.conda
-https://conda.anaconda.org/conda-forge/osx-64/blas-2.126-openblas.conda
 https://conda.anaconda.org/conda-forge/osx-64/clang_impl_osx-64-19.1.6-h5cba23b_23.conda
 https://conda.anaconda.org/conda-forge/osx-64/libboost-python-devel-1.85.0-py312h0be7463_4.conda
 https://conda.anaconda.org/conda-forge/osx-64/libgdal-netcdf-3.10.0-hb143bf5_13.conda
