@@ -27,6 +27,7 @@ EXTERNAL_DIR="${THIS_SCRIPT_DIR}/external"
 CONFIG_HOME="$HOME/.config"
 SDK=
 GRASSDIR=
+GRASS_MAC_FILES=macosx/app
 DEPLOYMENT_TARGET=
 GRASS_VERSION=""
 GRASS_VERSION_MAJOR=""
@@ -48,8 +49,7 @@ BUNDLE_VERSION=
 REPACKAGE=0
 CONDA_UPDATE_STABLE=0
 WITH_LIBLAS=0
-MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/\
-Miniforge3-MacOSX-${CONDA_ARCH}.sh"
+MINICONDA_URL="https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 CS_ENTITLEMENTS="${THIS_SCRIPT_DIR}/files/grass.entitlements"
 CS_IDENT=
 CS_KEYCHAIN_PROFILE=
@@ -109,7 +109,7 @@ Arguments:
                         -isysroot, required, spaces in path not allowed
   -t
   --target    [target]  Set deployment target version (MACOSX_DEPLOYMENT_TARGET),
-                        e.g. "10.14", optional, default is set from SDK
+                        e.g. "10.15", optional, default is set from SDK
   -o
   --dmg-out-dir [path]  Output directory path for DMG file creation
                         This is a requirement for creating .dmg files.
@@ -128,7 +128,7 @@ Arguments:
 
 Example:
   ./$THIS_SCRIPT
-  ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk \\
+  ./$THIS_SCRIPT -s /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk \\
       -g /Volumes/dev/grass
 
 _EOF_
@@ -159,6 +159,11 @@ function read_grass_version () {
     GRASS_APP_BUNDLE="/Applications/$GRASS_APP_NAME"
     DMG_TITLE="GRASS-GIS-${GRASS_VERSION}"
     DMG_NAME="grass-${GRASS_VERSION}-${CONDA_ARCH}.dmg"
+    if [ "$GRASS_VERSION_MAJOR$GRASS_VERSION_MINOR" -lt 85 ]; then
+        GRASS_MAC_FILES=macosx/app
+    else 
+        GRASS_MAC_FILES=macos/files
+    fi
 }
 
 # This set the build version for CFBundleVersion, in case of dev version the
@@ -191,7 +196,7 @@ function make_app_bundle_dir () {
     mkdir -m 0755 "$resources_dir"
     mkdir -m 0755 "$macos_dir"
 
-    local info_plist_in="$GRASSDIR/macosx/app/Info.plist.in"
+    local info_plist_in="$GRASSDIR/$GRASS_MAC_FILES/Info.plist.in"
 
     sed "s|@GRASS_VERSION_DATE@|$GRASS_VERSION_DATE|g" "$info_plist_in" | \
         sed "s|@GRASS_VERSION_MAJOR@|$GRASS_VERSION_MAJOR|g" | \
@@ -213,8 +218,8 @@ function make_app_bundle_dir () {
     # cp -p "$GRASSDIR/macosx/app/build_html_user_index.sh" \
     #     "$macos_dir/build_html_user_index.sh"
     cp -p "$THIS_SCRIPT_DIR/files/grass.scpt" "${macos_dir}/grass.scpt"
-    cp -p "$GRASSDIR/macosx/app/AppIcon.icns" "$resources_dir/AppIcon.icns"
-    cp -p "$GRASSDIR/macosx/app/GRASSDocument_gxw.icns" \
+    cp -p "$GRASSDIR/$GRASS_MAC_FILES/AppIcon.icns" "$resources_dir/AppIcon.icns"
+    cp -p "$GRASSDIR/$GRASS_MAC_FILES/GRASSDocument_gxw.icns" \
         "$resources_dir/GRASSDocument_gxw.icns"
 
     chmod 0644 "$contents_dir/Info.plist"
@@ -272,7 +277,7 @@ function set_up_conda () {
     fi
 
     $BASH "$miniconda" -b -f -p "$CONDA_TEMP_DIR"
-    CONDA_BIN="$CONDA_TEMP_DIR/bin/mamba"
+    CONDA_BIN="$CONDA_TEMP_DIR/bin/conda"
     if [ ! -f "$CONDA_BIN" ]; then
         echo "Error, could not find conda binary file at ${CONDA_BIN}"
         exit_nice 1 cleanup
@@ -313,7 +318,7 @@ function create_dmg () {
     exact_app_size=$(du -ks "$GRASS_APP_BUNDLE" | cut -f 1)
     dmg_size=$((exact_app_size*120/100))
 
-    sudo hdiutil create -srcfolder "$GRASS_APP_BUNDLE" \
+    hdiutil create -srcfolder "$GRASS_APP_BUNDLE" \
         -volname "$DMG_TITLE" \
         -fs HFS+ \
         -fsargs "-c c=64,a=16,e=16" \
@@ -325,14 +330,14 @@ function create_dmg () {
         exit_nice $?
     fi
 
-    DEVICE=$(sudo hdiutil attach -readwrite -noverify -noautoopen "${dmg_tmpfile}" | grep -E '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}')
-    sudo hdiutil attach "${dmg_tmpfile}" || error "Can't attach temp DMG"
+    DEVICE=$(hdiutil attach -readwrite -noverify -noautoopen "${dmg_tmpfile}" | grep -E '^/dev/' | sed -e "s/^\/dev\///g" -e 1q  | awk '{print $1}')
+    hdiutil attach "${dmg_tmpfile}" || error "Can't attach temp DMG"
 
     mkdir -p "/Volumes/${DMG_TITLE}/.background"
     cp -p "${THIS_SCRIPT_DIR}/files/dmg-background.png" \
         "/Volumes/${DMG_TITLE}/.background/background.png"
 
-    sudo osascript << EOF
+    osascript << EOF
 tell application "Finder"
     tell disk "$DMG_TITLE"
         open
@@ -428,7 +433,7 @@ function codesign_app () {
     "$CODESIGN" --sign "${CS_IDENT}" --force --verbose --timestamp --options runtime \
         --entitlements "$CS_ENTITLEMENTS" "./MacOS/grass.scpt"
 
-    # cp "$CS_PROVISIONPROFILE" embedded.provisionprofile
+    cp "$CS_PROVISIONPROFILE" embedded.provisionprofile
     # xattr -r -d com.apple.FinderInfo embedded.provisionprofile
 
     popd > /dev/null || exit $?
